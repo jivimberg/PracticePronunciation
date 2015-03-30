@@ -4,5 +4,9 @@
     <string name="app_name">PracticePronunciation</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="speak">Speak</string>
+    <string name="listen">listen</string>
+    <string name="add">add</string>
+    <string name="pronounce_hint">Write something to pronounce</string>
 
 </resources>
