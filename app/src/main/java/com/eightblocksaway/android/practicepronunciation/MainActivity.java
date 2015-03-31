@@ -17,6 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,10 +108,12 @@ public class MainActivity extends ActionBarActivity {
                 speakButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        final String phrase = editText.getText().toString().trim();
+
                         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");
+                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say \"" + phrase + "\"" );
                         startActivityForResult(intent, SPEECH_RECOGNITION_CODE);
                     }
                 });
@@ -123,8 +128,8 @@ public class MainActivity extends ActionBarActivity {
             startActivityForResult(checkIntent, TTS_CHECK_CODE);
         }
 
-        public void onActivityResult(
-                int requestCode, int resultCode, Intent data) {
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            // Handle TTS Check
             if (requestCode == TTS_CHECK_CODE) {
                 if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                     // success, create the TTS instance
@@ -138,12 +143,19 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
 
+            // Handle speech recognition result
             if (requestCode == SPEECH_RECOGNITION_CODE && resultCode == RESULT_OK)
             {
+                final String phrase = editText.getText().toString().trim();
                 // Populate the wordsList with the String values the recognition engine thought it heard
                 ArrayList<String> matches = data.getStringArrayListExtra(
                         RecognizerIntent.EXTRA_RESULTS);
-                Log.i("Speech Recognition", matches.toString());
+
+                PronunciationRecognitionResult result = PronunciationRecognitionResult.evaluate(phrase, matches);
+                Log.i(PronunciationRecognitionResult.LOG_TAG, "Pronunciation recognition result: " + result);
+
+                //TODO improve this
+                Toast.makeText(getActivity(), result.name(), Toast.LENGTH_SHORT).show();
             }
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -156,7 +168,7 @@ public class MainActivity extends ActionBarActivity {
             listenButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String phrase = editText.getText().toString();
+                    final String phrase = editText.getText().toString().trim();
                     if(Build.VERSION.SDK_INT >= 21){
                         mTts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null, Integer.toString(phrase.hashCode()));
                     } else {
