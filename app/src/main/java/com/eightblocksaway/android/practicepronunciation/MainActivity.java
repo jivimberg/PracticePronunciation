@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation;
 
 import android.content.Intent;
+import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
@@ -112,7 +113,11 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     final String phrase = editText.getText().toString();
-                    mTts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null, Integer.toString(phrase.hashCode()));
+                    if(Build.VERSION.SDK_INT >= 21){
+                        mTts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null, Integer.toString(phrase.hashCode()));
+                    } else {
+                        mTts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
             });
 
