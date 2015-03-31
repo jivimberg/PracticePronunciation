@@ -1,12 +1,15 @@
 package com.eightblocksaway.android.practicepronunciation;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -60,9 +65,11 @@ public class MainActivity extends ActionBarActivity {
     public static class MainFragment extends Fragment implements TextToSpeech.OnInitListener {
 
         private static final int TTS_CHECK_CODE = 1;
+        private static final int SPEECH_RECOGNITION_CODE = 2;
         private TextToSpeech mTts;
 
         private ImageButton listenButton;
+        private ImageButton speakButton;
         private EditText editText;
 
         public MainFragment() {
@@ -74,15 +81,43 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             listenButton = (ImageButton) rootView.findViewById(R.id.listen_button);
+            listenButton.setEnabled(false);
+
+            speakButton = (ImageButton) rootView.findViewById(R.id.speak_button);
+            speakButton.setEnabled(false);
+
             editText = (EditText) rootView.findViewById(R.id.editText);
 
             //TODO later...
-            checkTTSAvailability();
+            enableTTS();
+            enableSpeechRecognition();
 
             return rootView;
         }
 
-        private void checkTTSAvailability() {
+        private void enableSpeechRecognition() {
+            // Disable button if no recognition service is present
+            PackageManager pm = getActivity().getPackageManager();
+            List<ResolveInfo> activities = pm.queryIntentActivities(
+                    new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+            if (activities.size() != 0)
+            {
+                speakButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");
+                        startActivityForResult(intent, SPEECH_RECOGNITION_CODE);
+                    }
+                });
+
+                speakButton.setEnabled(true);
+            }
+        }
+
+        private void enableTTS() {
             Intent checkIntent = new Intent();
             checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
             startActivityForResult(checkIntent, TTS_CHECK_CODE);
@@ -102,6 +137,15 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(installIntent);
                 }
             }
+
+            if (requestCode == SPEECH_RECOGNITION_CODE && resultCode == RESULT_OK)
+            {
+                // Populate the wordsList with the String values the recognition engine thought it heard
+                ArrayList<String> matches = data.getStringArrayListExtra(
+                        RecognizerIntent.EXTRA_RESULTS);
+                Log.i("Speech Recognition", matches.toString());
+            }
+            super.onActivityResult(requestCode, resultCode, data);
         }
 
         @Override
