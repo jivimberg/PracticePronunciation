@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
 import java.util.ArrayList;
@@ -113,14 +114,10 @@ public class MainActivity extends ActionBarActivity {
             editText = (EditText) rootView.findViewById(R.id.editText);
             editText.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
                 @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
                 @Override
                 public void afterTextChanged(Editable s) {
@@ -158,6 +155,7 @@ public class MainActivity extends ActionBarActivity {
 
                     ContentValues phraseValues = new ContentValues();
                     phraseValues.put(PhraseEntry.COLUMN_TEXT, phrase);
+                    phraseValues.put(PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
 
                     getActivity().getContentResolver().insert(PhraseEntry.CONTENT_URI, phraseValues);
 
@@ -242,13 +240,22 @@ public class MainActivity extends ActionBarActivity {
 
                 PronunciationRecognitionResult result = PronunciationRecognitionResult.evaluate(phrase, matches);
                 Log.i(PronunciationRecognitionResult.LOG_TAG, "Pronunciation recognition result: " + result);
-                int today = Time.getJulianDay(System.currentTimeMillis(), new Time().gmtoff);
 
                 //persist result
+                /*
+                int today = Time.getJulianDay(System.currentTimeMillis(), new Time().gmtoff);
                 ContentValues attemptValues = new ContentValues();
                 attemptValues.put(AttemptEntry.COLUMN_DATE, today);
                 attemptValues.put(AttemptEntry.COLUMN_RESULT_ID, result.name());
                 getActivity().getContentResolver().insert(AttemptEntry.buildAttemptWithPhrase(phrase), attemptValues);
+                 */
+
+                //TODO this should be done in the background
+
+                ContentValues attemptValues = new ContentValues();
+                attemptValues.put(PhraseEntry.COLUMN_MASTERY_LEVEL, result.getScore());
+                getActivity().getContentResolver().update(PhraseEntry.CONTENT_URI,
+                        attemptValues, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
 
                 //TODO improve this
                 Toast.makeText(getActivity(), result.name(), Toast.LENGTH_SHORT).show();

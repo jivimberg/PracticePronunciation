@@ -13,4 +13,10 @@
         android:layout_height="fill_parent"
         android:text="@string/placeholder"/>
 
+    <TextView
+        android:id="@+id/mastery_level"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:text="@string/placeholder"/>
+
 </LinearLayout>

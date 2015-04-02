@@ -21,5 +21,10 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
         int columnTextIndex = cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT);
         String text = cursor.getString(columnTextIndex);
         phraseText.setText(text);
+
+        TextView masteryLevelTextView = (TextView) view.findViewById(R.id.mastery_level);
+        int columnMasteryLevelIndex = cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL);
+        int masteryLevel = cursor.getInt(columnMasteryLevelIndex);
+        masteryLevelTextView.setText(Integer.toString(masteryLevel));
     }
 }

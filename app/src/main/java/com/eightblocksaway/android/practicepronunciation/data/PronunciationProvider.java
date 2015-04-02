@@ -55,13 +55,13 @@ public class PronunciationProvider extends ContentProvider {
                         "." + PhraseEntry._ID);
     }
 
-    private static final String phraseByText=
+    public static final String phraseByTextSelector =
             PhraseEntry.TABLE_NAME+
                     "." + PhraseEntry.COLUMN_TEXT + " = ? ";
 
     private Cursor getAttemptsByPhrase(Uri uri, String[] projection, String sortOrder) {
         String[] selectionArgs = new String[]{AttemptEntry.getPhraseFromUri(uri)};
-        String selection = phraseByText;
+        String selection = phraseByTextSelector;
 
         return attemptsByPhraseQueryBuilder.query(dbHelper.getReadableDatabase(),
                 projection,
@@ -199,7 +199,7 @@ public class PronunciationProvider extends ContentProvider {
 
                 Cursor cursor = null;
                 try{
-                    cursor = db.query(PhraseEntry.TABLE_NAME, new String[]{PhraseEntry._ID}, phraseByText, new String[]{phraseFromUri}, null, null, null);
+                    cursor = db.query(PhraseEntry.TABLE_NAME, new String[]{PhraseEntry._ID}, phraseByTextSelector, new String[]{phraseFromUri}, null, null, null);
                     if(cursor.moveToFirst()){
                         values.put(AttemptEntry.COLUMN_PHRASE_KEY, cursor.getInt(0)); //Zero because we are only getting 1 column in our projection
 
@@ -269,8 +269,58 @@ public class PronunciationProvider extends ContentProvider {
     @Override
     public int update(
             Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        // Take the code from sunshine if needed
-        throw new UnsupportedOperationException("I don't support updates");
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated;
+        if(null ==  selection) {
+            throw new IllegalArgumentException("selection argument was missing");
+        }
+
+        switch (match) {
+            case PHRASE: {
+                Cursor cursor = null;
+
+                if(values.containsKey(PhraseEntry.COLUMN_MASTERY_LEVEL)){
+                    Integer attemptResult = values.getAsInteger(PhraseEntry.COLUMN_MASTERY_LEVEL);
+
+                    try{
+                        //Calculate points
+                        cursor = db.query(PhraseEntry.TABLE_NAME, new String[]{PhraseEntry.COLUMN_MASTERY_LEVEL}, selection, selectionArgs, null, null, null);
+                        if(cursor.moveToFirst()){
+                            int currentMasteryLevel = cursor.getInt(0);
+                            int updatedResult = currentMasteryLevel + attemptResult;
+                            if(updatedResult < 0)
+                                updatedResult = 0;
+                            if(updatedResult > 10)
+                                updatedResult = 10;
+
+                            values.put(PhraseEntry.COLUMN_MASTERY_LEVEL, updatedResult);
+
+                            rowsUpdated = db.update(PhraseEntry.TABLE_NAME, values, selection, selectionArgs);
+                            Log.i(LOG_TAG, "Updated " + rowsUpdated + " phrase. With values " + values);
+                        } else {
+                            Log.i(LOG_TAG, "Couldn't find phrase in the DB. Not updating");
+                            rowsUpdated = 0;
+                        }
+
+                    } finally {
+                        if(cursor != null && !cursor.isClosed())
+                            cursor.close();
+                    }
+                } else {
+                    Log.i(LOG_TAG, "Couldn't find value for Column Mastery Level");
+                    rowsUpdated = 0;
+                }
+
+
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null); //Use the parent uri, not the returnUri to notify!
+        return rowsUpdated;
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing

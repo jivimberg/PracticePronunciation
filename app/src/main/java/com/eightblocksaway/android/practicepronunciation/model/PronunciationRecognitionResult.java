@@ -7,11 +7,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public enum PronunciationRecognitionResult {
-    EXCELLENT,
-    GOOD,
-    TRY_AGAIN;
+    EXCELLENT(1),
+    GOOD(0),
+    TRY_AGAIN(-1);
 
     public static final String LOG_TAG = "Speech Recognition";
+    private int score;
+
+    private PronunciationRecognitionResult(int score){
+        this.score = score;
+    }
 
     public static PronunciationRecognitionResult evaluate(@NotNull String phrase, @NotNull ArrayList<String> matches){
         Log.i(LOG_TAG, "Expected phrase: " + phrase);
@@ -27,5 +32,9 @@ public enum PronunciationRecognitionResult {
         }
 
         return TRY_AGAIN;
+    }
+
+    public int getScore() {
+        return score;
     }
 }
