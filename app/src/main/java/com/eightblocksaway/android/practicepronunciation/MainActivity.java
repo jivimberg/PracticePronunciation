@@ -16,6 +16,8 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -96,6 +98,8 @@ public class MainActivity extends ActionBarActivity {
         private EditText editText;
         private ListView phraseList;
         private PhrasesCursorAdapter phrasesCursorAdapter;
+        private boolean speechRecognitionInitialized = false;
+        private boolean ttsInitialized = false;
 
         public MainFragment() {
         }
@@ -107,6 +111,26 @@ public class MainActivity extends ActionBarActivity {
             getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
             editText = (EditText) rootView.findViewById(R.id.editText);
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if(s.toString().trim().length() == 0){
+                        dissableButtons();
+                    } else {
+                        enableButtons();
+                    }
+                }
+            });
 
             phraseList = (ListView) rootView.findViewById(R.id.phrase_list);
             phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
@@ -126,6 +150,7 @@ public class MainActivity extends ActionBarActivity {
             speakButton.setEnabled(false);
 
             addButton = (ImageButton) rootView.findViewById(R.id.add_button);
+            addButton.setEnabled(false);
             addButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -148,6 +173,20 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
 
+        private void enableButtons() {
+            if(ttsInitialized)
+                listenButton.setEnabled(true);
+            if(speechRecognitionInitialized)
+                speakButton.setEnabled(true);
+            addButton.setEnabled(true);
+        }
+
+        private void dissableButtons() {
+            listenButton.setEnabled(false);
+            speakButton.setEnabled(false);
+            addButton.setEnabled(false);
+        }
+
         private void enableSpeechRecognition() {
             // Disable button if no recognition service is present
             PackageManager pm = getActivity().getPackageManager();
@@ -168,7 +207,7 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
 
-                speakButton.setEnabled(true);
+                speechRecognitionInitialized = true;
             }
         }
 
@@ -234,7 +273,7 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
-            listenButton.setEnabled(true);
+            ttsInitialized = true;
         }
 
         @Override
