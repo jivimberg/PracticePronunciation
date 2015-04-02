@@ -96,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
         private ImageButton listenButton;
         private ImageButton speakButton;
         private ImageButton addButton;
+        private ImageButton clearEditText;
         private EditText editText;
         private ListView phraseList;
         private PhrasesCursorAdapter phrasesCursorAdapter;
@@ -126,6 +127,14 @@ public class MainActivity extends ActionBarActivity {
                     } else {
                         enableButtons();
                     }
+                }
+            });
+
+            clearEditText = (ImageButton) rootView.findViewById(R.id.clear_editText);
+            clearEditText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editText.setText("");
                 }
             });
 
@@ -177,12 +186,16 @@ public class MainActivity extends ActionBarActivity {
             if(speechRecognitionInitialized)
                 speakButton.setEnabled(true);
             addButton.setEnabled(true);
+            clearEditText.setEnabled(true);
+            clearEditText.setVisibility(View.VISIBLE);
         }
 
         private void dissableButtons() {
             listenButton.setEnabled(false);
             speakButton.setEnabled(false);
             addButton.setEnabled(false);
+            clearEditText.setEnabled(false);
+            clearEditText.setVisibility(View.INVISIBLE);
         }
 
         private void enableSpeechRecognition() {

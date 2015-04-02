@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
@@ -22,9 +23,13 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
         String text = cursor.getString(columnTextIndex);
         phraseText.setText(text);
 
-        TextView masteryLevelTextView = (TextView) view.findViewById(R.id.mastery_level);
         int columnMasteryLevelIndex = cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL);
         int masteryLevel = cursor.getInt(columnMasteryLevelIndex);
-        masteryLevelTextView.setText(Integer.toString(masteryLevel));
+
+        TextView masteryLevelTextView = (TextView) view.findViewById(R.id.mastery_level);
+        masteryLevelTextView.setText(masteryLevel + "/10");
+
+        ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.mastery_level_progress_bar);
+        progressBar.setProgress(masteryLevel);
     }
 }

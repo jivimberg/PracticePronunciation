@@ -37,7 +37,7 @@
                 android:layout_weight="1"
                 android:max="10"
                 android:progress="7"
-                style="@android:style/Widget.ProgressBar.Horizontal"/>
+                style="@android:style/Widget.Material.ProgressBar.Horizontal"/>
         </LinearLayout>
 
 </LinearLayout>
