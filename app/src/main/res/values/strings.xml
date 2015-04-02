@@ -7,7 +7,7 @@
     <string name="speak">Speak</string>
     <string name="listen">listen</string>
     <string name="add">add</string>
-    <string name="pronounce_hint">Write something to pronounce</string>
+    <string name="pronounce_hint">Touch to type</string>
     <string name="content_authority">com.eightblocksaway.android.practicepronunciation.app</string>
     <string name="placeholder">Placeholder</string>
 

@@ -40,7 +40,7 @@ public class PronunciationProvider extends ContentProvider {
 
     static final int PHRASE = 100;
     static final int ATTEMPT = 200;
-    static final int ATTEMPTS_BY_PHRASE = 201;
+    static final int ATTEMPTS_WITH_PHRASE = 201;
 
     private static final SQLiteQueryBuilder attemptsByPhraseQueryBuilder;
 
@@ -88,7 +88,7 @@ public class PronunciationProvider extends ContentProvider {
         // PronunciationContract to help define the types to the UriMatcher.
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PHRASE, PHRASE);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_ATTEMPT, ATTEMPT);
-        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_ATTEMPT + "/*", ATTEMPTS_BY_PHRASE);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_ATTEMPT + "/*", ATTEMPTS_WITH_PHRASE);
 
         // 3) Return the new matcher!
         return uriMatcher;
@@ -121,7 +121,7 @@ public class PronunciationProvider extends ContentProvider {
                 return PhraseEntry.CONTENT_ITEM_TYPE;
             case ATTEMPT:
                 return AttemptEntry.CONTENT_ITEM_TYPE;
-            case ATTEMPTS_BY_PHRASE:
+            case ATTEMPTS_WITH_PHRASE:
                 return AttemptEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -136,7 +136,7 @@ public class PronunciationProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             // "attempts/*"
-            case ATTEMPTS_BY_PHRASE: {
+            case ATTEMPTS_WITH_PHRASE: {
                 retCursor = getAttemptsByPhrase(uri, projection, sortOrder);
                 break;
             }
@@ -181,7 +181,7 @@ public class PronunciationProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
-        Uri returnUri;
+        Uri returnUri = null;
 
         switch (match) {
             case PHRASE: {
@@ -193,14 +193,30 @@ public class PronunciationProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case ATTEMPT: {
+            case ATTEMPTS_WITH_PHRASE: {
                 normalizeDate(values);
-                long _id = db.insert(AttemptEntry.TABLE_NAME, null, values);
-                if ( _id > 0 ) {
-                    Log.i(LOG_TAG, "Inserted attempt " + values);
-                    returnUri = AttemptEntry.buildAttemptUri(_id);
-                } else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                String phraseFromUri = AttemptEntry.getPhraseFromUri(uri);
+
+                Cursor cursor = null;
+                try{
+                    cursor = db.query(PhraseEntry.TABLE_NAME, new String[]{PhraseEntry._ID}, phraseByText, new String[]{phraseFromUri}, null, null, null);
+                    if(cursor.moveToFirst()){
+                        values.put(AttemptEntry.COLUMN_PHRASE_KEY, cursor.getInt(0)); //Zero because we are only getting 1 column in our projection
+
+                        long _id = db.insert(AttemptEntry.TABLE_NAME, null, values);
+                        if ( _id > 0 ) {
+                            Log.i(LOG_TAG, "Inserted attempt " + values);
+                            returnUri = AttemptEntry.buildAttemptUri(_id);
+                        } else
+                            throw new android.database.SQLException("Failed to insert row into " + uri);
+                    } else {
+                        Log.i(LOG_TAG, "Couldn't find phrase " + phraseFromUri + " in the DB. Not persisting attempt");
+                    }
+                } finally {
+                    if(cursor != null && !cursor.isClosed())
+                        cursor.close();
+                }
+
                 break;
             }
             default:

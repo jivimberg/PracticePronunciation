@@ -92,8 +92,8 @@ public class PronunciationContract {
         /*
             Student: Fill in this buildWeatherLocation function
          */
-        public static Uri buildAttempts(String locationSetting) {
-            return CONTENT_URI.buildUpon().appendPath(locationSetting).build();
+        public static Uri buildAttemptWithPhrase(String phrase) {
+            return CONTENT_URI.buildUpon().appendPath(phrase).build();
         }
 
         public static String getPhraseFromUri(Uri uri) {

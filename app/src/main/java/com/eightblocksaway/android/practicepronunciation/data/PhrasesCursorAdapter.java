@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
-import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 
 public class PhrasesCursorAdapter extends ResourceCursorAdapter {
 

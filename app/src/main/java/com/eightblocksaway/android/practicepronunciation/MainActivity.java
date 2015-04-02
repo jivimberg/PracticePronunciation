@@ -16,6 +16,8 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +39,8 @@ import com.eightblocksaway.android.practicepronunciation.model.PronunciationReco
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.eightblocksaway.android.practicepronunciation.data.PronunciationContract.*;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -128,9 +132,9 @@ public class MainActivity extends ActionBarActivity {
                     final String phrase = editText.getText().toString().trim();
 
                     ContentValues phraseValues = new ContentValues();
-                    phraseValues.put(PronunciationContract.PhraseEntry.COLUMN_TEXT, phrase);
+                    phraseValues.put(PhraseEntry.COLUMN_TEXT, phrase);
 
-                    getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
+                    getActivity().getContentResolver().insert(PhraseEntry.CONTENT_URI, phraseValues);
 
                     //hide soft keyboard
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -199,6 +203,13 @@ public class MainActivity extends ActionBarActivity {
 
                 PronunciationRecognitionResult result = PronunciationRecognitionResult.evaluate(phrase, matches);
                 Log.i(PronunciationRecognitionResult.LOG_TAG, "Pronunciation recognition result: " + result);
+                int today = Time.getJulianDay(System.currentTimeMillis(), new Time().gmtoff);
+
+                //persist result
+                ContentValues attemptValues = new ContentValues();
+                attemptValues.put(AttemptEntry.COLUMN_DATE, today);
+                attemptValues.put(AttemptEntry.COLUMN_RESULT_ID, result.name());
+                getActivity().getContentResolver().insert(AttemptEntry.buildAttemptWithPhrase(phrase), attemptValues);
 
                 //TODO improve this
                 Toast.makeText(getActivity(), result.name(), Toast.LENGTH_SHORT).show();
@@ -228,8 +239,8 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            Uri uri = PronunciationContract.PhraseEntry.CONTENT_URI;
-            return new CursorLoader(getActivity(), uri, null, null, null, PronunciationContract.PhraseEntry._ID + " DESC");
+            Uri uri = PhraseEntry.CONTENT_URI;
+            return new CursorLoader(getActivity(), uri, null, null, null, PhraseEntry._ID + " DESC");
         }
 
         @Override
