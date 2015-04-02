@@ -23,9 +23,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
@@ -105,6 +107,13 @@ public class MainActivity extends ActionBarActivity {
             phraseList = (ListView) rootView.findViewById(R.id.phrase_list);
             phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
             phraseList.setAdapter(phrasesCursorAdapter);
+            phraseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    TextView phraseText = (TextView) view.findViewById(R.id.phrase_text);
+                    editText.setText(phraseText.getText());
+                }
+            });
 
             listenButton = (ImageButton) rootView.findViewById(R.id.listen_button);
             listenButton.setEnabled(false);
