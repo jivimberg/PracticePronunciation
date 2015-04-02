@@ -72,7 +72,7 @@
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/word_list"
+            android:id="@+id/phrase_list"
             android:background="#fff3f3f3"
             android:layout_gravity="center_horizontal"/>
     </FrameLayout>

@@ -1,11 +1,17 @@
 package com.eightblocksaway.android.practicepronunciation;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -17,8 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
 import java.util.ArrayList;
@@ -65,15 +74,20 @@ public class MainActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class MainFragment extends Fragment implements TextToSpeech.OnInitListener {
+    public static class MainFragment extends Fragment implements TextToSpeech.OnInitListener, LoaderManager.LoaderCallbacks<Cursor>
+    {
 
         private static final int TTS_CHECK_CODE = 1;
         private static final int SPEECH_RECOGNITION_CODE = 2;
+        private static final int LOADER_ID = 1;
         private TextToSpeech mTts;
 
         private ImageButton listenButton;
         private ImageButton speakButton;
+        private ImageButton addButton;
         private EditText editText;
+        private ListView phraseList;
+        private PhrasesCursorAdapter phrasesCursorAdapter;
 
         public MainFragment() {
         }
@@ -82,6 +96,13 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+            editText = (EditText) rootView.findViewById(R.id.editText);
+
+            phraseList = (ListView) rootView.findViewById(R.id.phrase_list);
+            phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
+            phraseList.setAdapter(phrasesCursorAdapter);
 
             listenButton = (ImageButton) rootView.findViewById(R.id.listen_button);
             listenButton.setEnabled(false);
@@ -89,9 +110,19 @@ public class MainActivity extends ActionBarActivity {
             speakButton = (ImageButton) rootView.findViewById(R.id.speak_button);
             speakButton.setEnabled(false);
 
-            editText = (EditText) rootView.findViewById(R.id.editText);
+            addButton = (ImageButton) rootView.findViewById(R.id.add_button);
+            addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String phrase = editText.getText().toString().trim();
 
-            //TODO later...
+                    ContentValues phraseValues = new ContentValues();
+                    phraseValues.put(PronunciationContract.PhraseEntry.COLUMN_TEXT, phrase);
+
+                    getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
+                }
+            });
+
             enableTTS();
             enableSpeechRecognition();
 
@@ -178,6 +209,22 @@ public class MainActivity extends ActionBarActivity {
             });
 
             listenButton.setEnabled(true);
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            Uri uri = PronunciationContract.PhraseEntry.CONTENT_URI;
+            return new CursorLoader(getActivity(), uri, null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            phrasesCursorAdapter.swapCursor(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            phrasesCursorAdapter.swapCursor(null);
         }
     }
 }
