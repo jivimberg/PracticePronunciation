@@ -220,7 +220,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Uri uri = PronunciationContract.PhraseEntry.CONTENT_URI;
-            return new CursorLoader(getActivity(), uri, null, null, null, null);
+            return new CursorLoader(getActivity(), uri, null, null, null, PronunciationContract.PhraseEntry._ID + " DESC");
         }
 
         @Override
