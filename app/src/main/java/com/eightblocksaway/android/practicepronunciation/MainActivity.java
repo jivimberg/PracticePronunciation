@@ -91,6 +91,7 @@ public class MainActivity extends ActionBarActivity {
         private static final int TTS_CHECK_CODE = 1;
         private static final int SPEECH_RECOGNITION_CODE = 2;
         private static final int LOADER_ID = 1;
+        private static final String LOG_TAG = "MainFrame";
         private TextToSpeech mTts;
 
         private ImageButton listenButton;
@@ -191,19 +192,15 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
 
-        //TODO review what happens on back button
-//        @Override
-//        public void onStop() {
-//            super.onPause();
-//            if(mTts != null)
-//                mTts.shutdown();
-//        }
-//
-//        @Override
-//        public void onStart() {
-//            super.onResume();
-//            enableTTS();
-//        }
+        @Override
+        public void onDestroyView() {
+            super.onDestroyView();
+            if(mTts != null){
+                Log.d(LOG_TAG, "Shutting down TTS Engine");
+                mTts.shutdown();
+            }
+        }
+
 
         private void enableButtons() {
             if(ttsInitialized)
