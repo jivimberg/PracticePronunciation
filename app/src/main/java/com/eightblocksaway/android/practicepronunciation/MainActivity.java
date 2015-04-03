@@ -177,8 +177,33 @@ public class MainActivity extends ActionBarActivity {
             enableTTS();
             enableSpeechRecognition();
 
+            //Starting from intent
+            Intent receivedIntent = getActivity().getIntent();
+            String receivedAction = receivedIntent.getAction();
+            if(receivedAction.equals(Intent.ACTION_SEND)){
+                String receivedType = receivedIntent.getType();
+                if(receivedType.startsWith("text/plain")){
+                    String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
+                    editText.setText(receivedText);
+                }
+            }
+
             return rootView;
         }
+
+        //TODO review what happens on back button
+//        @Override
+//        public void onStop() {
+//            super.onPause();
+//            if(mTts != null)
+//                mTts.shutdown();
+//        }
+//
+//        @Override
+//        public void onStart() {
+//            super.onResume();
+//            enableTTS();
+//        }
 
         private void enableButtons() {
             if(ttsInitialized)
@@ -219,6 +244,10 @@ public class MainActivity extends ActionBarActivity {
                 });
 
                 speechRecognitionInitialized = true;
+
+                if(!editText.getText().toString().isEmpty()){
+                    speakButton.setEnabled(true);
+                }
             }
         }
 
@@ -234,6 +263,10 @@ public class MainActivity extends ActionBarActivity {
                 if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                     // success, create the TTS instance
                     mTts = new TextToSpeech(getActivity(), this);
+
+                    if(!editText.getText().toString().isEmpty()){
+                        listenButton.setEnabled(true);
+                    }
                 } else {
                     // missing data, install it
                     Intent installIntent = new Intent();
