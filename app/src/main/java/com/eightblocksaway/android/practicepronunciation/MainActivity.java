@@ -8,6 +8,9 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.LoaderManager;
@@ -17,9 +20,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.format.DateUtils;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,10 +37,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
-import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -103,6 +107,8 @@ public class MainActivity extends ActionBarActivity {
         private PhrasesCursorAdapter phrasesCursorAdapter;
         private boolean speechRecognitionInitialized = false;
         private boolean ttsInitialized = false;
+        private TextView pronunciationAlphabetLabel;
+        private Handler pronunciationAlphabetHandler;
 
         public MainFragment() {
         }
@@ -113,8 +119,16 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
+            pronunciationAlphabetLabel = (TextView) rootView.findViewById(R.id.pronunciation_alphabet_label);
+
+            pronunciationAlphabetHandler = new PronunciationHandler(this, pronunciationAlphabetLabel);
+
             editText = (EditText) rootView.findViewById(R.id.editText);
             editText.addTextChangedListener(new TextWatcher() {
+                private final long DELAY = 1000; // in ms
+                public static final int TRIGGER_SERACH = 1;
+                public String previousPhrase = "";
+
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -123,7 +137,20 @@ public class MainActivity extends ActionBarActivity {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if(s.toString().trim().length() == 0){
+                    final String phrase = s.toString().trim();
+
+                    if(!previousPhrase.equals(phrase)){
+                        pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
+                    }
+                    previousPhrase = phrase;
+
+                    pronunciationAlphabetHandler.removeMessages(TRIGGER_SERACH);
+                    Message newMessage = Message.obtain();
+                    newMessage.what = TRIGGER_SERACH;
+                    newMessage.obj = phrase;
+                    pronunciationAlphabetHandler.sendMessageDelayed(newMessage, DELAY);
+
+                    if(phrase.length() == 0){
                         dissableButtons();
                     } else {
                         enableButtons();
@@ -340,6 +367,30 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             phrasesCursorAdapter.swapCursor(null);
+        }
+
+        static class PronunciationHandler extends Handler {
+            private final WeakReference<MainFragment> weakReference;
+            private final TextView pronunciationAlphabetTextView;
+
+            PronunciationHandler(@NotNull MainFragment fragment, @NotNull TextView pronunciationAlphabetTextView) {
+                super(Looper.getMainLooper());
+                weakReference = new WeakReference<>(fragment);
+                this.pronunciationAlphabetTextView = pronunciationAlphabetTextView;
+            }
+
+            @Override
+            public void handleMessage(Message msg)
+            {
+                MainFragment fragment = weakReference.get();
+                if (fragment != null) {
+                    if (msg.obj instanceof String) {
+                        String phrase = (String) msg.obj;
+                        if(!TextUtils.isEmpty(phrase))
+                            new PronunciationAlphabetAsyncTask(pronunciationAlphabetTextView).execute(phrase);
+                    }
+                }
+            }
         }
     }
 }
