@@ -28,6 +28,7 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
 
         TextView phrasePronunciation = (TextView) view.findViewById(R.id.phrase_pronunciation);
         String pronunciation = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION));
+        phrasePronunciation.setText("");
         if(!TextUtils.isEmpty(pronunciation)){
             phrasePronunciation.setText(pronunciation);
         }

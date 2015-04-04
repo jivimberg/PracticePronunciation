@@ -157,7 +157,9 @@ public class MainActivity extends ActionBarActivity {
                                 //change add button for remove button
                                 addButton.setVisibility(View.GONE);
                                 removeButton.setVisibility(View.VISIBLE);
-                            } else {
+                            }
+
+                            if(TextUtils.isEmpty(pronunciationAlphabetLabel.getText().toString().trim())){
                                 //word not on DB
                                 pronunciationAlphabetHandler.removeMessages(TRIGGER_SEARCH);
                                 Message newMessage = Message.obtain();
@@ -394,18 +396,22 @@ public class MainActivity extends ActionBarActivity {
                 //persist result
                 /*
                 int today = Time.getJulianDay(System.currentTimeMillis(), new Time().gmtoff);
-                ContentValues attemptValues = new ContentValues();
-                attemptValues.put(AttemptEntry.COLUMN_DATE, today);
-                attemptValues.put(AttemptEntry.COLUMN_RESULT_ID, result.name());
-                getActivity().getContentResolver().insert(AttemptEntry.buildAttemptWithPhrase(phrase), attemptValues);
+                ContentValues values = new ContentValues();
+                values.put(AttemptEntry.COLUMN_DATE, today);
+                values.put(AttemptEntry.COLUMN_RESULT_ID, result.name());
+                getActivity().getContentResolver().insert(AttemptEntry.buildAttemptWithPhrase(phrase), values);
                  */
 
                 //TODO this should be done in the background
 
-                ContentValues attemptValues = new ContentValues();
-                attemptValues.put(PhraseEntry.COLUMN_MASTERY_LEVEL, result.getScore());
+                ContentValues values = new ContentValues();
+                values.put(PhraseEntry.COLUMN_MASTERY_LEVEL, result.getScore());
+                String pronunciation = pronunciationAlphabetLabel.getText().toString().trim();
+                if(!TextUtils.isEmpty(pronunciation)){
+                    values.put(PhraseEntry.COLUMN_PRONUNCIATION, pronunciation);
+                }
                 getActivity().getContentResolver().update(PhraseEntry.CONTENT_URI,
-                        attemptValues, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
+                        values, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
 
                 View toastRoot = getActivity().getLayoutInflater().inflate(R.layout.recognition_result_toast_layout, null);
 
