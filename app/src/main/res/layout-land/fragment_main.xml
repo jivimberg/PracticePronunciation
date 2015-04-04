@@ -117,11 +117,11 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:background="@android:color/darker_gray">
 
-        <ListView
+        <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/phrase_list"
-            android:background="#fff3f3f3"
+            android:background="@android:color/darker_gray"
             android:layout_gravity="center_horizontal"/>
     </FrameLayout>
 

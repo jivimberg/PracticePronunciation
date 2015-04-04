@@ -20,6 +20,7 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        view.setBackgroundColor(context.getResources().getColor(R.color.list_item_color));
         TextView phraseText = (TextView) view.findViewById(R.id.phrase_text);
         int columnTextIndex = cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT);
         String text = cursor.getString(columnTextIndex);

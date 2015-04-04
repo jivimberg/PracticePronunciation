@@ -15,6 +15,7 @@ import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -41,8 +42,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -86,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
         private ImageButton removeButton;
         private ImageButton clearEditText;
         private EditText editText;
-        private ListView phraseList;
+        private DynamicListView phraseList;
         private PhrasesCursorAdapter phrasesCursorAdapter;
         private boolean speechRecognitionInitialized = false;
         private boolean ttsInitialized = false;
@@ -124,6 +129,7 @@ public class MainActivity extends ActionBarActivity {
 
                     if(!previousPhrase.equals(phrase)){
                         pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
+                        pronunciationAlphabetLabel.setText("");
                         //change remove button back to +
                         removeButton.setVisibility(View.GONE);
                         addButton.setVisibility(View.VISIBLE);
@@ -175,7 +181,24 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
-            phraseList = (ListView) rootView.findViewById(R.id.phrase_list);
+            phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list);
+//            phraseList.enableSwipeToDismiss(
+//                    new OnDismissCallback() {
+//                        @Override
+//                        public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+//                            final String phrase = getCurrentPhrase();
+//                            for (int position : reverseSortedPositions) {
+//                                Cursor cursor = (Cursor) phrasesCursorAdapter.getItem(position);
+//                                String removingPhrase = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_TEXT));
+//                                getActivity().getContentResolver().delete(PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{removingPhrase});
+//
+//                                if(phrase.equals(removingPhrase)){
+//                                    editText.setText("");
+//                                }
+//                            }
+//                        }
+//                    }
+//            );
             phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
             phraseList.setAdapter(phrasesCursorAdapter);
             phraseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
