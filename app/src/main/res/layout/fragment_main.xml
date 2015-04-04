@@ -52,6 +52,7 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:gravity="center">
 
 
@@ -61,7 +62,7 @@
                 android:layout_weight="1"
                 android:id="@+id/listen_button"
                 android:src="@drawable/listen_button_selector"
-                android:background="@null"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/listen" />
 
             <ImageButton
@@ -70,7 +71,7 @@
                 android:layout_weight="1"
                 android:src="@drawable/speak_button_selector"
                 android:id="@+id/speak_button"
-                android:background="@null"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/speak"/>
 
             <ImageButton
@@ -79,7 +80,7 @@
                 android:layout_weight="1"
                 android:src="@drawable/add_button_selector"
                 android:id="@+id/add_button"
-                android:background="@null"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/add"/>
         </LinearLayout>
 
