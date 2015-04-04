@@ -1,5 +1,6 @@
 package com.eightblocksaway.android.practicepronunciation;
 
+import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
@@ -144,16 +146,37 @@ public class MainActivity extends ActionBarActivity {
                     }
                     previousPhrase = phrase;
 
-                    pronunciationAlphabetHandler.removeMessages(TRIGGER_SERACH);
-                    Message newMessage = Message.obtain();
-                    newMessage.what = TRIGGER_SERACH;
-                    newMessage.obj = phrase;
-                    pronunciationAlphabetHandler.sendMessageDelayed(newMessage, DELAY);
-
                     if(phrase.length() == 0){
                         dissableButtons();
                     } else {
                         enableButtons();
+
+                        Cursor cursor = null;
+                        try{
+                            cursor = getActivity().getContentResolver().query(PhraseEntry.CONTENT_URI,
+                                    new String[]{PhraseEntry.COLUMN_PRONUNCIATION},
+                                    PronunciationProvider.phraseByTextSelector,
+                                    new String[]{phrase},
+                                    null);
+
+                            if(cursor.moveToFirst()){
+                                //word from DB
+                                String string = cursor.getString(0);
+                                updatePronunciationLabel(string);
+
+                                //TODO change add button state
+                            } else {
+                                //word not on DB
+                                pronunciationAlphabetHandler.removeMessages(TRIGGER_SERACH);
+                                Message newMessage = Message.obtain();
+                                newMessage.what = TRIGGER_SERACH;
+                                newMessage.obj = phrase;
+                                pronunciationAlphabetHandler.sendMessageDelayed(newMessage, DELAY);
+                            }
+                        } finally {
+                            if(cursor != null && !cursor.isClosed())
+                                cursor.close();
+                        }
                     }
                 }
             });
@@ -172,8 +195,8 @@ public class MainActivity extends ActionBarActivity {
             phraseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    TextView phraseText = (TextView) view.findViewById(R.id.phrase_text);
-                    editText.setText(phraseText.getText());
+                    Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                    editText.setText(cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_TEXT)));
                 }
             });
 
@@ -193,6 +216,10 @@ public class MainActivity extends ActionBarActivity {
                     ContentValues phraseValues = new ContentValues();
                     phraseValues.put(PhraseEntry.COLUMN_TEXT, phrase);
                     phraseValues.put(PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
+                    String pronunciation = pronunciationAlphabetLabel.getText().toString().trim();
+                    if(!TextUtils.isEmpty(pronunciation)){
+                        phraseValues.put(PhraseEntry.COLUMN_PRONUNCIATION, pronunciation);
+                    }
 
                     getActivity().getContentResolver().insert(PhraseEntry.CONTENT_URI, phraseValues);
 
@@ -217,6 +244,13 @@ public class MainActivity extends ActionBarActivity {
             }
 
             return rootView;
+        }
+
+        private void updatePronunciationLabel(String string) {
+            if(!TextUtils.isEmpty(string)){
+                pronunciationAlphabetLabel.setText(string);
+                pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
