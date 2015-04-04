@@ -244,6 +244,7 @@ public class PronunciationProvider extends ContentProvider {
         switch (match) {
             case PHRASE: {
                 rowsDeleted = db.delete(PhraseEntry.TABLE_NAME, selection, selectionArgs);
+                Log.i(LOG_TAG, "Removed " + rowsDeleted + " rows");
                 break;
             }
             default:

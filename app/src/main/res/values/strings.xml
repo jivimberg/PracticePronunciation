@@ -12,5 +12,6 @@
     <string name="phrase_placeholder">Placeholder</string>
     <string name="mastery_level_text_placeholder">7/10</string>
     <string name="close">close</string>
+    <string name="remove">remove</string>
 
 </resources>

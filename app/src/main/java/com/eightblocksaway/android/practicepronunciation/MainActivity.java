@@ -104,6 +104,7 @@ public class MainActivity extends ActionBarActivity {
         private ImageButton listenButton;
         private ImageButton speakButton;
         private ImageButton addButton;
+        private ImageButton removeButton;
         private ImageButton clearEditText;
         private EditText editText;
         private ListView phraseList;
@@ -129,7 +130,7 @@ public class MainActivity extends ActionBarActivity {
             editText = (EditText) rootView.findViewById(R.id.editText);
             editText.addTextChangedListener(new TextWatcher() {
                 private final long DELAY = 1000; // in ms
-                public static final int TRIGGER_SERACH = 1;
+                public static final int TRIGGER_SEARCH = 1;
                 public String previousPhrase = "";
 
                 @Override
@@ -144,6 +145,9 @@ public class MainActivity extends ActionBarActivity {
 
                     if(!previousPhrase.equals(phrase)){
                         pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
+                        //change remove button back to +
+                        removeButton.setVisibility(View.GONE);
+                        addButton.setVisibility(View.VISIBLE);
                     }
                     previousPhrase = phrase;
 
@@ -165,12 +169,14 @@ public class MainActivity extends ActionBarActivity {
                                 String string = cursor.getString(0);
                                 updatePronunciationLabel(string);
 
-                                //TODO change add button state
+                                //change add button for remove button
+                                addButton.setVisibility(View.GONE);
+                                removeButton.setVisibility(View.VISIBLE);
                             } else {
                                 //word not on DB
-                                pronunciationAlphabetHandler.removeMessages(TRIGGER_SERACH);
+                                pronunciationAlphabetHandler.removeMessages(TRIGGER_SEARCH);
                                 Message newMessage = Message.obtain();
-                                newMessage.what = TRIGGER_SERACH;
+                                newMessage.what = TRIGGER_SEARCH;
                                 newMessage.obj = phrase;
                                 pronunciationAlphabetHandler.sendMessageDelayed(newMessage, DELAY);
                             }
@@ -212,10 +218,8 @@ public class MainActivity extends ActionBarActivity {
             addButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String phrase = editText.getText().toString().trim();
-
                     ContentValues phraseValues = new ContentValues();
-                    phraseValues.put(PhraseEntry.COLUMN_TEXT, phrase);
+                    phraseValues.put(PhraseEntry.COLUMN_TEXT, getCurrentPhrase());
                     phraseValues.put(PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
                     String pronunciation = pronunciationAlphabetLabel.getText().toString().trim();
                     if(!TextUtils.isEmpty(pronunciation)){
@@ -227,6 +231,16 @@ public class MainActivity extends ActionBarActivity {
                     //hide soft keyboard
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                }
+            });
+
+            removeButton = (ImageButton) rootView.findViewById(R.id.remove_button);
+            removeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String phrase = getCurrentPhrase();
+                    getActivity().getContentResolver().delete(PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
+                    editText.setText("");
                 }
             });
 
@@ -245,6 +259,10 @@ public class MainActivity extends ActionBarActivity {
             }
 
             return rootView;
+        }
+
+        private String getCurrentPhrase() {
+            return editText.getText().toString().trim();
         }
 
         private void updatePronunciationLabel(String string) {
@@ -292,12 +310,11 @@ public class MainActivity extends ActionBarActivity {
                 speakButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final String phrase = editText.getText().toString().trim();
 
                         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say \"" + phrase + "\"" );
+                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say \"" + getCurrentPhrase() + "\"" );
                         startActivityForResult(intent, SPEECH_RECOGNITION_CODE);
                     }
                 });
@@ -399,7 +416,7 @@ public class MainActivity extends ActionBarActivity {
             listenButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String phrase = editText.getText().toString().trim();
+                    final String phrase = getCurrentPhrase();
                     if(Build.VERSION.SDK_INT >= 21){
                         mTts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null, Integer.toString(phrase.hashCode()));
                     } else {

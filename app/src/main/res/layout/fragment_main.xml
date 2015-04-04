@@ -82,6 +82,16 @@
                 android:id="@+id/add_button"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/add"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/remove_button_selector"
+                android:id="@+id/remove_button"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/remove"
+                android:visibility="gone"/>
         </LinearLayout>
 
     </LinearLayout>
