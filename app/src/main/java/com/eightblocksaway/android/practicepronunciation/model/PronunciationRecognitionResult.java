@@ -7,15 +7,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public enum PronunciationRecognitionResult {
-    EXCELLENT(1),
-    GOOD(0),
-    TRY_AGAIN(-1);
+    EXCELLENT("Excellent!", 1),
+    GOOD("Very good", 0),
+    TRY_AGAIN("Try Again", -1);
 
     public static final String LOG_TAG = "Speech Recognition";
+    private final String displayText;
     private int score;
 
-    private PronunciationRecognitionResult(int score){
+    private PronunciationRecognitionResult(String displayText, int score){
         this.score = score;
+        this.displayText = displayText;
     }
 
     public static PronunciationRecognitionResult evaluate(@NotNull String phrase, @NotNull ArrayList<String> matches){
@@ -36,5 +38,9 @@ public enum PronunciationRecognitionResult {
 
     public int getScore() {
         return score;
+    }
+
+    public String getDisplayText() {
+        return displayText;
     }
 }

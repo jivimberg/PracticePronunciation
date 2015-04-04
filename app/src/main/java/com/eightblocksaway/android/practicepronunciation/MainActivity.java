@@ -1,12 +1,12 @@
 package com.eightblocksaway.android.practicepronunciation;
 
-import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -24,6 +24,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,12 +34,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
-import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
@@ -361,8 +362,31 @@ public class MainActivity extends ActionBarActivity {
                 getActivity().getContentResolver().update(PhraseEntry.CONTENT_URI,
                         attemptValues, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
 
-                //TODO improve this
-                Toast.makeText(getActivity(), result.name(), Toast.LENGTH_SHORT).show();
+                View toastRoot = getActivity().getLayoutInflater().inflate(R.layout.recognition_result_toast_layout, null);
+
+                TextView resultTextView = (TextView) toastRoot.findViewById(R.id.result);
+                resultTextView.setText(result.getDisplayText());
+
+                ImageView icon = (ImageView) toastRoot.findViewById(R.id.icon);
+                Drawable drawable = null;
+                switch (result){
+                    case EXCELLENT:
+                        drawable = getActivity().getResources().getDrawable(R.drawable.excellent);
+                        break;
+                    case GOOD:
+                        drawable = getActivity().getResources().getDrawable(R.drawable.good);
+                        break;
+                    case TRY_AGAIN:
+                        drawable = getActivity().getResources().getDrawable(R.drawable.try_again);
+                        break;
+                }
+
+                icon.setImageDrawable(drawable);
+
+                Toast toast = new Toast(getActivity());
+                toast.setView(toastRoot);
+                toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 0, 128);
+                toast.show();
             }
             super.onActivityResult(requestCode, resultCode, data);
         }
