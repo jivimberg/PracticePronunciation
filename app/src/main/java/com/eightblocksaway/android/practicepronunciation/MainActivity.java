@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -317,6 +318,32 @@ public class MainActivity extends ActionBarActivity {
                 if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                     // success, create the TTS instance
                     mTts = new TextToSpeech(getActivity(), this);
+                    if(Build.VERSION.SDK_INT >= 15){
+                        mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                            @Override
+                            public void onStart(String utteranceId) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        listenButton.setPressed(true);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onDone(String utteranceId) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        listenButton.setPressed(false);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(String utteranceId) {}
+                        });
+                    }
 
                     if(!editText.getText().toString().isEmpty()){
                         listenButton.setEnabled(true);
