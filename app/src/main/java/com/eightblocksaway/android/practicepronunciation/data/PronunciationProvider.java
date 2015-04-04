@@ -25,6 +25,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
+import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
+
 import static com.eightblocksaway.android.practicepronunciation.data.PronunciationContract.AttemptEntry;
 import static com.eightblocksaway.android.practicepronunciation.data.PronunciationContract.CONTENT_AUTHORITY;
 import static com.eightblocksaway.android.practicepronunciation.data.PronunciationContract.PATH_ATTEMPT;
@@ -290,10 +292,10 @@ public class PronunciationProvider extends ContentProvider {
                         if(cursor.moveToFirst()){
                             int currentMasteryLevel = cursor.getInt(0);
                             int updatedResult = currentMasteryLevel + attemptResult;
-                            if(updatedResult < 0)
-                                updatedResult = 0;
-                            if(updatedResult > 10)
-                                updatedResult = 10;
+                            if(updatedResult < PronunciationRecognitionResult.MIN_SCORE)
+                                updatedResult = PronunciationRecognitionResult.MIN_SCORE;
+                            if(updatedResult > PronunciationRecognitionResult.MAX_SCORE)
+                                updatedResult = PronunciationRecognitionResult.MAX_SCORE;
 
                             values.put(PhraseEntry.COLUMN_MASTERY_LEVEL, updatedResult);
 

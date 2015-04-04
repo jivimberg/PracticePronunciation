@@ -15,6 +15,9 @@ public enum PronunciationRecognitionResult {
     private final String displayText;
     private int score;
 
+    public static final int MIN_SCORE = 0;
+    public static final int MAX_SCORE = 10;
+
     private PronunciationRecognitionResult(String displayText, int score){
         this.score = score;
         this.displayText = displayText;

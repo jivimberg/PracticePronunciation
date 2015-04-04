@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
+import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 
 public class PhrasesCursorAdapter extends ResourceCursorAdapter {
 
@@ -34,7 +35,7 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
         int masteryLevel = cursor.getInt(columnMasteryLevelIndex);
 
         TextView masteryLevelTextView = (TextView) view.findViewById(R.id.mastery_level);
-        masteryLevelTextView.setText(masteryLevel + "/10");
+        masteryLevelTextView.setText(masteryLevel + "/" + PronunciationRecognitionResult.MAX_SCORE);
 
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.mastery_level_progress_bar);
         progressBar.setProgress(masteryLevel);
