@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -17,17 +17,16 @@
 
         <TextView
             android:id="@+id/phrase_text"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:layout_weight="1"
             android:textAppearance="?android:textAppearanceLarge"
             android:text="@string/phrase_placeholder"/>
 
         <TextView
             android:id="@+id/phrase_pronunciation"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:layout_weight="1"
+            android:text="@string/phrase_placeholder"
             android:textAppearance="?android:textAppearanceSmall" />
 
     </LinearLayout>
@@ -42,8 +41,7 @@
         <TextView
             android:id="@+id/mastery_level"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:gravity="bottom"
             android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/mastery_level_text_placeholder"/>
@@ -51,8 +49,7 @@
         <ProgressBar
             android:id="@+id/mastery_level_progress_bar"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:max="10"
             android:progress="7"
             style="@android:style/Widget.Material.ProgressBar.Horizontal"/>
