@@ -15,7 +15,6 @@ import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -28,8 +27,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -37,17 +34,13 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
-import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -72,6 +65,13 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+        mainFragment.populateViewFromIntent();
+    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -251,6 +251,12 @@ public class MainActivity extends ActionBarActivity {
             enableTTS();
             enableSpeechRecognition();
 
+            populateViewFromIntent();
+
+            return rootView;
+        }
+
+        public void populateViewFromIntent() {
             //Starting from intent
             Intent receivedIntent = getActivity().getIntent();
             String receivedAction = receivedIntent.getAction();
@@ -261,8 +267,6 @@ public class MainActivity extends ActionBarActivity {
                     editText.setText(receivedText);
                 }
             }
-
-            return rootView;
         }
 
         private String getCurrentPhrase() {
