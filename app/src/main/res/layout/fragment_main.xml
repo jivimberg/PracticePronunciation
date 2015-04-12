@@ -110,6 +110,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/phrase_list"
             android:background="@android:color/darker_gray"
+            android:drawSelectorOnTop="true"
             android:layout_gravity="center_horizontal"/>
     </FrameLayout>
 
