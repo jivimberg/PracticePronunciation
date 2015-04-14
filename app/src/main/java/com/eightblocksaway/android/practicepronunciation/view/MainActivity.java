@@ -17,6 +17,12 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
         setContentView(R.layout.activity_main);
 
         phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().findFragmentById(R.id.phrase_input_fragment);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, new PhraseListFragment())
+                    .commit();
+        }
     }
 
     @Override

@@ -13,12 +13,10 @@
         android:name="com.eightblocksaway.android.practicepronunciation.view.PhraseInputFragment"
         tools:layout="@layout/phrase_input_fragment" />
 
-    <fragment
-        android:id="@+id/phrase_list_fragment"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.eightblocksaway.android.practicepronunciation.view.PhraseListFragment"
-        tools:layout="@layout/phrase_list_fragment"
         android:layout_below="@+id/phrase_input_fragment"/>
 
 </RelativeLayout>
