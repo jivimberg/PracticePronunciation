@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@android:color/darker_gray">
+
+
+    <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/phrase_list"
+        android:background="@android:color/darker_gray"
+        android:drawSelectorOnTop="true"
+        android:layout_gravity="center_horizontal"/>
+</FrameLayout>

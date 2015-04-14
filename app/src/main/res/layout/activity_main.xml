@@ -1,4 +1,24 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    tools:context=".MainActivity" tools:ignore="MergeRootFrame" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:ignore="MergeRootFrame">
+
+    <fragment
+        android:id="@+id/phrase_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.eightblocksaway.android.practicepronunciation.view.PhraseInputFragment"
+        tools:layout="@layout/phrase_input_fragment" />
+
+    <fragment
+        android:id="@+id/phrase_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.eightblocksaway.android.practicepronunciation.view.PhraseListFragment"
+        tools:layout="@layout/phrase_list_fragment"
+        android:layout_below="@+id/phrase_input"/>
+
+</RelativeLayout>

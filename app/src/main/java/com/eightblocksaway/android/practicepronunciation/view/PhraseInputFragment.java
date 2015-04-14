@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,9 +17,6 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -30,7 +26,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -39,11 +34,9 @@ import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.PronunciationAlphabetAsyncTask;
 import com.eightblocksaway.android.practicepronunciation.R;
-import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
-import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -55,12 +48,11 @@ import java.util.Locale;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInitListener, LoaderManager.LoaderCallbacks<Cursor>
+public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInitListener
 {
 
     private static final int TTS_CHECK_CODE = 1;
     private static final int SPEECH_RECOGNITION_CODE = 2;
-    private static final int LOADER_ID = 1;
     private static final String LOG_TAG = "PhraseInputFragment";
     private TextToSpeech mTts;
 
@@ -71,20 +63,15 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private ImageButton clearEditText;
     private EditText editText;
 
-    private PhrasesCursorAdapter phrasesCursorAdapter;
     private boolean speechRecognitionInitialized = false;
     private boolean ttsInitialized = false;
     private TextView pronunciationAlphabetLabel;
     private Handler pronunciationAlphabetHandler;
 
-    public PhraseInputFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.phrase_input_fragment, container, false);
-        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         pronunciationAlphabetLabel = (TextView) rootView.findViewById(R.id.pronunciation_alphabet_label);
 
@@ -159,34 +146,6 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             @Override
             public void onClick(View v) {
                 editText.setText("");
-            }
-        });
-
-        DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list);
-//            phraseList.enableSwipeToDismiss(
-//                    new OnDismissCallback() {
-//                        @Override
-//                        public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
-//                            final String phrase = getCurrentPhrase();
-//                            for (int position : reverseSortedPositions) {
-//                                Cursor cursor = (Cursor) phrasesCursorAdapter.getItem(position);
-//                                String removingPhrase = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_TEXT));
-//                                getActivity().getContentResolver().delete(PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{removingPhrase});
-//
-//                                if(phrase.equals(removingPhrase)){
-//                                    editText.setText("");
-//                                }
-//                            }
-//                        }
-//                    }
-//            );
-        phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
-        phraseList.setAdapter(phrasesCursorAdapter);
-        phraseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                editText.setText(cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT)));
             }
         });
 
@@ -443,22 +402,6 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         });
 
         ttsInitialized = true;
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri uri = PronunciationContract.PhraseEntry.CONTENT_URI;
-        return new CursorLoader(getActivity(), uri, null, null, null, PronunciationContract.PhraseEntry._ID + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        phrasesCursorAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        phrasesCursorAdapter.swapCursor(null);
     }
 
     static class PronunciationHandler extends Handler {
