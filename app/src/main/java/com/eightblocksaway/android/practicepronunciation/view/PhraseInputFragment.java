@@ -107,6 +107,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                 } else {
                     enableButtons();
 
+                    //TODO this should be moved out of here
                     Cursor cursor = null;
                     try{
                         cursor = getActivity().getContentResolver().query(PronunciationContract.PhraseEntry.CONTENT_URI,
@@ -189,22 +190,11 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         enableTTS();
         enableSpeechRecognition();
 
-        populateViewFromIntent();
-
         return rootView;
     }
 
-    public void populateViewFromIntent() {
-        //Starting from intent
-        Intent receivedIntent = getActivity().getIntent();
-        String receivedAction = receivedIntent.getAction();
-        if(receivedAction.equals(Intent.ACTION_SEND)){
-            String receivedType = receivedIntent.getType();
-            if(receivedType.startsWith("text/plain")){
-                String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
-                editText.setText(receivedText);
-            }
-        }
+    public void setPhrase(String phrase){
+        editText.setText(phrase);
     }
 
     private String getCurrentPhrase() {

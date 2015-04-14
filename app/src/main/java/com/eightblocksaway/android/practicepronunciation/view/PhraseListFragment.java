@@ -1,9 +1,9 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -29,6 +29,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
     private static final String LOG_TAG = "PhraseListFragment";
 
     private PhrasesCursorAdapter phrasesCursorAdapter;
+    private Callback callback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,7 +37,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         View rootView = inflater.inflate(R.layout.phrase_list_fragment, container, false);
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
-        DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list);
+        DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list_fragment);
 //            phraseList.enableSwipeToDismiss(
 //                    new OnDismissCallback() {
 //                        @Override
@@ -59,9 +60,10 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         phraseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-//                editText.setText(cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT)));
-                Toast.makeText(getActivity(), "I felt a click", Toast.LENGTH_SHORT).show();
+                //TODO change this to send only URI and use loaders?
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                String phrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
+                callback.onPhraseSelected(phrase);
             }
         });
 
@@ -82,6 +84,32 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         phrasesCursorAdapter.swapCursor(null);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onPhraseSelected(String phrase);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            callback = (Callback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
 }

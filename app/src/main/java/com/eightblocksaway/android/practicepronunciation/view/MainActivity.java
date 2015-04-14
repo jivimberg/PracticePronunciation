@@ -7,20 +7,35 @@ import android.os.Bundle;
 import com.eightblocksaway.android.practicepronunciation.R;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback {
+
+    private PhraseInputFragment phraseInputFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().findFragmentById(R.id.phrase_input_fragment);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        PhraseInputFragment phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().findFragmentById(R.id.container);
-        phraseInputFragment.populateViewFromIntent();
+
+        String receivedAction = intent.getAction();
+        if(receivedAction.equals(Intent.ACTION_SEND)){
+            String receivedType = intent.getType();
+            if(receivedType.startsWith("text/plain")){
+                String receivedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                phraseInputFragment.setPhrase(receivedText);
+            }
+        }
     }
 
+    @Override
+    public void onPhraseSelected(String phrase) {
+        phraseInputFragment.setPhrase(phrase);
+    }
 }
