@@ -9,6 +9,7 @@ import com.eightblocksaway.android.practicepronunciation.R;
 
 public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback {
 
+    private static final String INITIAL_FRAGMENT_TX = "Initial_tx";
     private PhraseInputFragment phraseInputFragment;
 
     @Override
@@ -43,5 +44,13 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     @Override
     public void onPhraseSelected(String phrase) {
         phraseInputFragment.setPhrase(phrase);
+
+        DetailFragment fragment = new DetailFragment();
+        //TODO implement
+        //fragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

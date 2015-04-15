@@ -34,7 +34,6 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.phrase_list_fragment, container, false);
-        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list_fragment);
 //            phraseList.enableSwipeToDismiss(
@@ -65,6 +64,9 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
                 callback.onPhraseSelected(phrase);
             }
         });
+
+        // Needs to be after the phraseCursorAdapter creation
+        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         return rootView;
     }
