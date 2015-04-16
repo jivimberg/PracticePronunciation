@@ -9,21 +9,29 @@ import com.eightblocksaway.android.practicepronunciation.R;
 
 public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback {
 
-    private static final String INITIAL_FRAGMENT_TX = "Initial_tx";
     private PhraseInputFragment phraseInputFragment;
+    private int detailFragmentContainerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().findFragmentById(R.id.phrase_input_fragment);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, new PhraseListFragment())
-                    .commit();
+        if(findViewById(R.id.multi_fragment_container) != null){
+            //phone
+            detailFragmentContainerId = R.id.multi_fragment_container;
+
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.multi_fragment_container, new PhraseListFragment())
+                        .commit();
+            }
+        } else {
+            //tablet
+            detailFragmentContainerId = R.id.detail_fragment_container;
         }
+
     }
 
     @Override
@@ -49,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
         //TODO implement
         //fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(detailFragmentContainerId, fragment)
                 .addToBackStack(null)
                 .commit();
     }
