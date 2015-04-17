@@ -1,4 +1,4 @@
-package com.eightblocksaway.android.practicepronunciation;
+package com.eightblocksaway.android.practicepronunciation.network;
 
 import android.net.Uri;
 import android.os.AsyncTask;

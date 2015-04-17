@@ -10,9 +10,6 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -32,15 +29,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.eightblocksaway.android.practicepronunciation.PronunciationAlphabetAsyncTask;
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
+import com.eightblocksaway.android.practicepronunciation.network.PhraseDataHandler;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -66,7 +60,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private boolean speechRecognitionInitialized = false;
     private boolean ttsInitialized = false;
     private TextView pronunciationAlphabetLabel;
-    private Handler pronunciationAlphabetHandler;
+    private PhraseDataHandler phraseDataHandler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,12 +69,11 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
         pronunciationAlphabetLabel = (TextView) rootView.findViewById(R.id.pronunciation_alphabet_label);
 
-        pronunciationAlphabetHandler = new PronunciationHandler(this, pronunciationAlphabetLabel);
+        phraseDataHandler = new PhraseDataHandler(this, pronunciationAlphabetLabel);
 
         editText = (EditText) rootView.findViewById(R.id.editText);
         editText.addTextChangedListener(new TextWatcher() {
             private final long DELAY = 1000; // in ms
-            public static final int TRIGGER_SEARCH = 1;
             public String previousPhrase = "";
 
             @Override
@@ -128,11 +121,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
                         if(TextUtils.isEmpty(pronunciationAlphabetLabel.getText().toString().trim())){
                             //word not on DB
-                            pronunciationAlphabetHandler.removeMessages(TRIGGER_SEARCH);
-                            Message newMessage = Message.obtain();
-                            newMessage.what = TRIGGER_SEARCH;
-                            newMessage.obj = phrase;
-                            pronunciationAlphabetHandler.sendMessageDelayed(newMessage, DELAY);
+                            phraseDataHandler.triggerFetch(phrase, DELAY);
                         }
                     } finally {
                         if(cursor != null && !cursor.isClosed())
@@ -392,29 +381,5 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         });
 
         ttsInitialized = true;
-    }
-
-    static class PronunciationHandler extends Handler {
-        private final WeakReference<PhraseInputFragment> weakReference;
-        private final TextView pronunciationAlphabetTextView;
-
-        PronunciationHandler(@NotNull PhraseInputFragment fragment, @NotNull TextView pronunciationAlphabetTextView) {
-            super(Looper.getMainLooper());
-            weakReference = new WeakReference<>(fragment);
-            this.pronunciationAlphabetTextView = pronunciationAlphabetTextView;
-        }
-
-        @Override
-        public void handleMessage(Message msg)
-        {
-            PhraseInputFragment fragment = weakReference.get();
-            if (fragment != null) {
-                if (msg.obj instanceof String) {
-                    String phrase = (String) msg.obj;
-                    if(!TextUtils.isEmpty(phrase))
-                        new PronunciationAlphabetAsyncTask(pronunciationAlphabetTextView).execute(phrase);
-                }
-            }
-        }
     }
 }
