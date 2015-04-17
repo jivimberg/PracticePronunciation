@@ -5,8 +5,8 @@
     android:id="@+id/pronounce_box"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     android:elevation="1sp"
     android:layout_height="wrap_content">
 
