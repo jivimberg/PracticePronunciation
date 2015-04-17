@@ -5,5 +5,5 @@
     <color name="accent">#FF8A65</color>
     <color name="excellent_color">@color/background_material_light</color>
     <color name="toast_background_color">#e6696969</color>
-    <color name="list_item_color">#fff3f3f3</color>
+    <color name="list_item_color">@color/background_material_light</color>
 </resources>
