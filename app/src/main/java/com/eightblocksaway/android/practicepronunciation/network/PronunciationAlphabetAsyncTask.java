@@ -17,7 +17,10 @@ public class PronunciationAlphabetAsyncTask extends AsyncTask<String, Void, Stri
 
     @Override
     protected String doInBackground(String... params) {
-        return FetchPronunciation.create(params[0]).fetchData();
+        String phrase = params[0];
+        String pronunciation = FetchPronunciation.create(phrase).fetchData();
+        String hyphenation = FetchHyphenation.create(phrase).fetchData();
+        return pronunciation;
     }
 
     @Override
