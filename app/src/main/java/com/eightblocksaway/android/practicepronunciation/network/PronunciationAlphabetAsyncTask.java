@@ -20,6 +20,7 @@ public class PronunciationAlphabetAsyncTask extends AsyncTask<String, Void, Stri
         String phrase = params[0];
         String pronunciation = FetchPronunciation.create(phrase).fetchData();
         String hyphenation = FetchHyphenation.create(phrase).fetchData();
+        String definitions = FetchDefinition.create(phrase).fetchData();
         return pronunciation;
     }
 

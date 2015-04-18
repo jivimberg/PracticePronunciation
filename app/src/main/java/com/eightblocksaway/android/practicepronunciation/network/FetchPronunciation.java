@@ -21,7 +21,7 @@ public class FetchPronunciation extends FetchCommand<String>{
                 .appendPath("pronunciations")
                 .appendQueryParameter("useCanonical", "false")
                 .appendQueryParameter("typeFormat", "ahd")
-                .appendQueryParameter("limit", "50")
+                .appendQueryParameter("limit", "1")
                 .appendQueryParameter("api_key", "a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5")
                 .build();
         return new FetchPronunciation(builtUri, phrase);
