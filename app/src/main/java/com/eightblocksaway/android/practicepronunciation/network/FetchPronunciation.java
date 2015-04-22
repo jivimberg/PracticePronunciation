@@ -16,8 +16,9 @@ public class FetchPronunciation extends FetchCommand<String>{
     }
 
     public static FetchPronunciation create(String phrase){
+        String normalizedPhrase = phrase.toLowerCase();
         Uri builtUri = Uri.parse(BASE_URI).buildUpon()
-                .appendPath(phrase)
+                .appendPath(normalizedPhrase)
                 .appendPath("pronunciations")
                 .appendQueryParameter("useCanonical", "false")
                 .appendQueryParameter("typeFormat", "ahd")

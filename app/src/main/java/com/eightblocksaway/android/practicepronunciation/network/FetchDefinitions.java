@@ -4,12 +4,16 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
+import com.eightblocksaway.android.practicepronunciation.model.Definition;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FetchDefinitions extends FetchCommand<String>{
+import java.util.ArrayList;
+import java.util.List;
+
+public class FetchDefinitions extends FetchCommand<List<Definition>>{
 
     private static final String LOG_TAG = "FetchPronunciation";
 
@@ -18,8 +22,9 @@ public class FetchDefinitions extends FetchCommand<String>{
     }
 
     public static FetchDefinitions create(String phrase){
+        String normalizedPhrase = phrase.toLowerCase();
         Uri builtUri = Uri.parse(BASE_URI).buildUpon()
-                .appendPath(phrase)
+                .appendPath(normalizedPhrase)
                 .appendPath("definitions")
                 .appendQueryParameter("useCanonical", "false")
                 .appendQueryParameter("limit", "5")
@@ -29,28 +34,23 @@ public class FetchDefinitions extends FetchCommand<String>{
     }
 
     @Override
-    protected String parseResult(String json) {
-        StringBuilder sb = new StringBuilder();
+    protected List<Definition> parseResult(String json) {
+        List<Definition> result = new ArrayList<>();
 
         try{
             JSONArray root = new JSONArray(json);
             for (int i = 0; i < root.length(); i++) {
                 JSONObject syllable = (JSONObject) root.get(i);
-                sb.append(syllable.getString("partOfSpeech"));
-                sb.append(DataUtil.INTERNAL_DEFINITION_SEPARATOR);
-                sb.append(syllable.getString("text"));
-
-                if(i != root.length() - 1){
-                    sb.append(DataUtil.DEFINITION_SEPARATOR);
-                }
+                String partOfSpeech = syllable.getString("partOfSpeech");
+                String definition = syllable.getString("text");
+                result.add(new Definition(definition, partOfSpeech));
             }
 
-            String result = sb.toString();
             Log.i(LOG_TAG, "Returning definitions " + result);
             return result;
         }catch (JSONException e){
             Log.e(LOG_TAG, "Couldn't parse response: " + json);
-            return "";
+            return result;
         }
     }
 }

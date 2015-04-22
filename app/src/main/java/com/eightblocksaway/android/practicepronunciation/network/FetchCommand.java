@@ -24,8 +24,7 @@ public abstract class FetchCommand<T> {
     public T fetchData(){
         BufferedReader reader = null;
         HttpURLConnection urlConnection = null;
-        String normalizedPhrase = phrase.toLowerCase();
-        Log.i(LOG_TAG, "Executing search for normalizedPhrase " + normalizedPhrase);
+        Log.i(LOG_TAG, "Executing search for normalized phrase " + phrase);
 
         try{
             URL url = new URL(uri.toString());

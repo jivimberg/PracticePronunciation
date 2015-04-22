@@ -4,23 +4,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
-import android.widget.TextView;
-
-import com.eightblocksaway.android.practicepronunciation.view.PhraseInputFragment;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
 public class PhraseDataHandler extends Handler {
-    private final WeakReference<PhraseInputFragment> weakReference;
-    private final TextView pronunciationAlphabetTextView;
+    private final WeakReference<PhraseFetchAsyncTask.Callback> weakReference;
     public static final int FETCH_DATA = 1;
 
-    public PhraseDataHandler(@NotNull PhraseInputFragment fragment, @NotNull TextView pronunciationAlphabetTextView) {
+    public PhraseDataHandler(@NotNull PhraseFetchAsyncTask.Callback callback) {
         super(Looper.getMainLooper());
-        weakReference = new WeakReference<>(fragment);
-        this.pronunciationAlphabetTextView = pronunciationAlphabetTextView;
+        weakReference = new WeakReference<>(callback);
     }
 
     public void triggerFetch(String phrase, long delay){
@@ -34,12 +29,12 @@ public class PhraseDataHandler extends Handler {
     @Override
     public void handleMessage(Message msg)
     {
-        PhraseInputFragment fragment = weakReference.get();
-        if (fragment != null) {
+        PhraseFetchAsyncTask.Callback callback = weakReference.get();
+        if (callback != null) {
             if (msg.obj instanceof String) {
                 String phrase = (String) msg.obj;
                 if(!TextUtils.isEmpty(phrase))
-                    new PronunciationAlphabetAsyncTask(pronunciationAlphabetTextView).execute(phrase);
+                    new PhraseFetchAsyncTask(callback).execute(phrase);
             }
         }
     }

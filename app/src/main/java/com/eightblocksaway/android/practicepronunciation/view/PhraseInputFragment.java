@@ -34,6 +34,9 @@ import com.eightblocksaway.android.practicepronunciation.data.PronunciationContr
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 import com.eightblocksaway.android.practicepronunciation.network.PhraseDataHandler;
+import com.eightblocksaway.android.practicepronunciation.network.PhraseFetchAsyncTask;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +72,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
         pronunciationAlphabetLabel = (TextView) rootView.findViewById(R.id.pronunciation_alphabet_label);
 
-        phraseDataHandler = new PhraseDataHandler(this, pronunciationAlphabetLabel);
+        phraseDataHandler = new PhraseDataHandler((PhraseFetchAsyncTask.Callback) getActivity());
 
         editText = (EditText) rootView.findViewById(R.id.editText);
         editText.addTextChangedListener(new TextWatcher() {
@@ -184,6 +187,11 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     public void setPhrase(String phrase){
         editText.setText(phrase);
+    }
+
+    public void setPronunciation(@NotNull String pronunciation) {
+        pronunciationAlphabetLabel.setText(pronunciation);
+        pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
     }
 
     private String getCurrentPhrase() {

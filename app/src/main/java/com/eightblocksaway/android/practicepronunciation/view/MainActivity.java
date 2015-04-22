@@ -5,12 +5,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 
 import com.eightblocksaway.android.practicepronunciation.R;
+import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+import com.eightblocksaway.android.practicepronunciation.network.PhraseFetchAsyncTask;
+
+import org.jetbrains.annotations.NotNull;
 
 
-public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback {
+public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback {
 
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
+    private DetailFragment detailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +58,23 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     public void onPhraseSelected(String phrase) {
         phraseInputFragment.setPhrase(phrase);
 
-        DetailFragment fragment = new DetailFragment();
+        detailFragment = new DetailFragment();
         //TODO implement
         //fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
-                .replace(detailFragmentContainerId, fragment)
+                .replace(detailFragmentContainerId, detailFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void onPhraseFetch(@NotNull Phrase phrase){
+        //set pronunciation
+        phraseInputFragment.setPronunciation(phrase.getPronunciation());
+
+        //set detail fragment
+        if(detailFragment != null && detailFragment.isVisible()){
+            detailFragment.setPhrase(phrase);
+        }
     }
 }

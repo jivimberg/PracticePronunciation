@@ -6,8 +6,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
+import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -65,4 +69,8 @@ public class DetailFragment extends Fragment {
     }
 
 
+    public void setPhrase(@NotNull Phrase phrase) {
+        TextView textView = (TextView) getActivity().findViewById(R.id.textview);
+        textView.setText(phrase.getDefinitions().toString());
+    }
 }
