@@ -3,19 +3,26 @@ package com.eightblocksaway.android.practicepronunciation.view;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+import com.eightblocksaway.android.practicepronunciation.network.AsyncTaskResult;
+import com.eightblocksaway.android.practicepronunciation.network.FetchCommand;
 import com.eightblocksaway.android.practicepronunciation.network.PhraseFetchAsyncTask;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
 
 public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback {
 
+    public static final String LOG_TAG = "MainActivity";
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
+    private boolean isPhone = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +32,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
         if(findViewById(R.id.multi_fragment_container) != null){
             //phone
+            isPhone = true;
             detailFragmentContainerId = R.id.multi_fragment_container;
 
             if (savedInstanceState == null) {
@@ -34,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             }
         } else {
             //tablet
+            isPhone = false;
             detailFragmentContainerId = R.id.detail_fragment_container;
         }
 
@@ -68,13 +77,34 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     }
 
     @Override
-    public void onPhraseFetch(@NotNull Phrase phrase){
-        //set pronunciation
-        phraseInputFragment.setPronunciation(phrase.getPronunciation());
+    public void onPhraseFetch(@NotNull AsyncTaskResult<Phrase> asyncTaskResult){
 
-        //set detail fragment
-        if(detailFragment != null && detailFragment.isVisible()){
-            detailFragment.setPhrase(phrase);
+        if(asyncTaskResult.wasSuccessfull()) {
+            Phrase phrase = asyncTaskResult.getResult();
+            //set pronunciation
+            phraseInputFragment.setPronunciation(phrase.getPronunciation());
+
+            //set detail fragment
+            if (detailFragment != null && detailFragment.isVisible()) {
+                detailFragment.setPhrase(phrase);
+            }
+        } else {
+            @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+            Exception e = asyncTaskResult.getError();
+
+            if(e instanceof IOException) {
+                // possible network error
+                //TODO
+                Log.i(LOG_TAG, "Network error");
+            } else if (e instanceof FetchCommand.EmptyResponseException) {
+                // word not found
+                Log.i(LOG_TAG, "Word not found");
+                //TODO
+            } else {
+                // parser exception and others
+                Log.e(LOG_TAG, "Parser exception", e);
+                //TODO
+            }
         }
     }
 }

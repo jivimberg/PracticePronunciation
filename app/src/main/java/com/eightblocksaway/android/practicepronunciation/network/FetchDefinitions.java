@@ -34,23 +34,17 @@ public class FetchDefinitions extends FetchCommand<List<Definition>>{
     }
 
     @Override
-    protected List<Definition> parseResult(String json) {
+    protected List<Definition> doParseResult(String json) throws JSONException {
         List<Definition> result = new ArrayList<>();
-
-        try{
-            JSONArray root = new JSONArray(json);
-            for (int i = 0; i < root.length(); i++) {
-                JSONObject syllable = (JSONObject) root.get(i);
-                String partOfSpeech = syllable.getString("partOfSpeech");
-                String definition = syllable.getString("text");
-                result.add(new Definition(definition, partOfSpeech));
-            }
-
-            Log.i(LOG_TAG, "Returning definitions " + result);
-            return result;
-        }catch (JSONException e){
-            Log.e(LOG_TAG, "Couldn't parse response: " + json);
-            return result;
+        JSONArray root = new JSONArray(json);
+        for (int i = 0; i < root.length(); i++) {
+            JSONObject syllable = (JSONObject) root.get(i);
+            String partOfSpeech = syllable.getString("partOfSpeech");
+            String definition = syllable.getString("text");
+            result.add(new Definition(definition, partOfSpeech));
         }
+
+        Log.i(LOG_TAG, "Returning definitions " + result);
+        return result;
     }
 }

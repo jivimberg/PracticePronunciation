@@ -59,7 +59,7 @@ public final class Syllable {
                 case "secondary stress":
                     return SECONDARY_STRESS;
                 default:
-                    throw new IllegalArgumentException("No valid Stress value: " + stressType);
+                    return NONE;
             }
         }
     }

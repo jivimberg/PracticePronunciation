@@ -3,6 +3,10 @@ package com.eightblocksaway.android.practicepronunciation.network;
 import android.net.Uri;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +25,7 @@ public abstract class FetchCommand<T> {
         this.phrase = phrase;
     }
 
-    public T fetchData(){
+    public T fetchData() throws IOException, JSONException, EmptyResponseException {
         BufferedReader reader = null;
         HttpURLConnection urlConnection = null;
         Log.i(LOG_TAG, "Executing search for normalized phrase " + phrase);
@@ -39,7 +43,7 @@ public abstract class FetchCommand<T> {
             StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
                 // Nothing to do.
-                return null;
+                throw new IOException("Couldn't get data. InputStream == null");
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -53,11 +57,12 @@ public abstract class FetchCommand<T> {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                return null;
+                throw new IOException("Couldn't get data. buffer is empty");
             }
             return parseResult(buffer.toString());
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Couldn't get pronunciation", e);
+            Log.e(LOG_TAG, "Couldn't get data", e);
+            throw e;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -70,9 +75,18 @@ public abstract class FetchCommand<T> {
                 }
             }
         }
-
-        return null;
     }
 
-    protected abstract T parseResult(String json);
+    private T parseResult(@NotNull String json) throws JSONException, EmptyResponseException {
+        JSONArray root = new JSONArray(json);
+        if(root.length() <= 0){
+            throw new EmptyResponseException();
+        } else {
+            return doParseResult(json);
+        }
+    }
+
+    protected abstract T doParseResult(String json) throws JSONException;
+
+    public static class EmptyResponseException extends Exception {}
 }

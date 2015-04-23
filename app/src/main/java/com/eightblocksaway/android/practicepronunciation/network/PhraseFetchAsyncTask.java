@@ -10,10 +10,12 @@ import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 import com.eightblocksaway.android.practicepronunciation.view.PhraseListFragment;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.List;
 
-public class PhraseFetchAsyncTask extends AsyncTask<String, Void, Phrase>{
+public class PhraseFetchAsyncTask extends AsyncTask<String, Void, AsyncTaskResult<Phrase>>{
 
     private static final String LOG_TAG = "PronunciationAlphabetAsyncTask";
     private final PhraseFetchAsyncTask.Callback  callback;
@@ -23,23 +25,27 @@ public class PhraseFetchAsyncTask extends AsyncTask<String, Void, Phrase>{
     }
 
     @Override
-    protected Phrase doInBackground(String... params) {
+    protected AsyncTaskResult<Phrase> doInBackground(String... params) {
         String phrase = params[0];
-        String pronunciation = FetchPronunciation.create(phrase).fetchData();
-        List<Definition> definitions = FetchDefinitions.create(phrase).fetchData();
-        List<Syllable> hyphenation = FetchHyphenation.create(phrase).fetchData();
+        try {
+            String pronunciation = FetchPronunciation.create(phrase).fetchData();
+            List<Definition> definitions = FetchDefinitions.create(phrase).fetchData();
+            List<Syllable> hyphenation = FetchHyphenation.create(phrase).fetchData();
 
-        return new Phrase(phrase, pronunciation, definitions, hyphenation);
+            return new AsyncTaskResult<>(new Phrase(phrase, pronunciation, definitions, hyphenation));
+        } catch (IOException | JSONException | FetchCommand.EmptyResponseException e) {
+            return new AsyncTaskResult<>(e);
+        }
     }
 
     @Override
-    protected void onPostExecute(Phrase result) {
+    protected void onPostExecute(AsyncTaskResult<Phrase> result) {
         super.onPostExecute(result);
 
         callback.onPhraseFetch(result);
     }
 
     public interface Callback {
-        public void onPhraseFetch(Phrase phrase);
+        public void onPhraseFetch(AsyncTaskResult<Phrase> phrase);
     }
 }

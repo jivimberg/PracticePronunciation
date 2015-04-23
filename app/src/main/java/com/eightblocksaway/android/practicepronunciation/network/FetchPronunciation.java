@@ -29,16 +29,11 @@ public class FetchPronunciation extends FetchCommand<String>{
     }
 
     @Override
-    protected String parseResult(String json) {
-        try{
-            JSONArray root = new JSONArray(json);
-            JSONObject jsonObject = (JSONObject) root.get(0);
-            String result = jsonObject.getString("raw");
-            Log.i(LOG_TAG, "Returning pronunciation " + result);
-            return result;
-        }catch (JSONException e){
-            Log.e(LOG_TAG, "Couldn't parse response: " + json);
-            return "";
-        }
+    protected String doParseResult(String json) throws JSONException {
+        JSONArray root = new JSONArray(json);
+        JSONObject jsonObject = (JSONObject) root.get(0);
+        String result = jsonObject.getString("raw");
+        Log.i(LOG_TAG, "Returning pronunciation " + result);
+        return result;
     }
 }

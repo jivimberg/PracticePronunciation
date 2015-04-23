@@ -34,23 +34,21 @@ public class FetchHyphenation extends FetchCommand<List<Syllable>>{
     }
 
     @Override
-    protected List<Syllable> parseResult(String json) {
+    protected List<Syllable> doParseResult(String json) throws JSONException {
         List<Syllable> result = new ArrayList<>();
 
-        try{
-            JSONArray root = new JSONArray(json);
-            for (int i = 0; i < root.length(); i++) {
-                JSONObject syllable = (JSONObject) root.get(i);
-                String text = syllable.getString("text");
-                String typeValue = syllable.getString("type");
-                Syllable.Stress type = Syllable.Stress.fromString(typeValue);
-                result.add(new Syllable(text, type));
+        JSONArray root = new JSONArray(json);
+        for (int i = 0; i < root.length(); i++) {
+            JSONObject syllable = (JSONObject) root.get(i);
+            String text = syllable.getString("text");
+            String typeValue = "none";
+            if(syllable.has("type")){
+                typeValue = syllable.getString("type");
             }
-            Log.i(LOG_TAG, "Returning hyphenation " + result);
-            return result;
-        }catch (JSONException e){
-            Log.e(LOG_TAG, "Couldn't parse response: " + json);
-            return result;
+            Syllable.Stress type = Syllable.Stress.fromString(typeValue);
+            result.add(new Syllable(text, type));
         }
+        Log.i(LOG_TAG, "Returning hyphenation " + result);
+        return result;
     }
 }
