@@ -11,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
-        android:paddingTop="@dimen/activity_vertical_margin"
         android:layout_weight="2"
         tools:ignore="MergeRootFrame">
 
@@ -37,7 +36,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:padding="@dimen/activity_vertical_margin"
-        android:background="@android:color/darker_gray" />
+        android:padding="@dimen/activity_vertical_margin"/>
 
 </LinearLayout>

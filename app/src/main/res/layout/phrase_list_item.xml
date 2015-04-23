@@ -6,7 +6,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
-    android:background="@color/list_item_color"
+    android:background="@color/app_fg"
     tools:context=".MainActivity$PlaceholderFragment"
     android:baselineAligned="false">
 

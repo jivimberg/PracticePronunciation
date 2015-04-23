@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:ignore="MergeRootFrame">
 
     <fragment
@@ -19,7 +18,7 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:background="@android:color/darker_gray"
+        android:background="@color/app_background"
         android:layout_below="@+id/phrase_input_fragment"/>
 
 </RelativeLayout>

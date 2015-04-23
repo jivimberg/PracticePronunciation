@@ -6,6 +6,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
+    android:background="@color/app_fg"
     tools:context=".MainActivity$PlaceholderFragment">
 
     <LinearLayout
