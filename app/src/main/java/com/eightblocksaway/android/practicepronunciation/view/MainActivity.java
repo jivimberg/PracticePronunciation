@@ -19,10 +19,12 @@ import java.io.IOException;
 public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback {
 
     public static final String LOG_TAG = "MainActivity";
+    public static final String ERROR_NO_NETWORK_TAG = "ERROR_NO_NETWORK";
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
     private boolean isPhone = true;
+    private DetailErrorFragment noWifiErrorFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,8 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             isPhone = false;
             detailFragmentContainerId = R.id.detail_fragment_container;
         }
+
+        noWifiErrorFragment = DetailErrorFragment.newInstance(R.drawable.ic_device_signal_wifi_off);
 
     }
 
@@ -94,16 +98,22 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
             if(e instanceof IOException) {
                 // possible network error
-                //TODO
                 Log.i(LOG_TAG, "Network error");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(detailFragmentContainerId, ErrorFragments.NO_WIFI.getFragmentInstance(), ErrorFragments.NO_WIFI.name())
+                        .commit();
             } else if (e instanceof FetchCommand.EmptyResponseException) {
                 // word not found
                 Log.i(LOG_TAG, "Word not found");
-                //TODO
+                getSupportFragmentManager().beginTransaction()
+                        .replace(detailFragmentContainerId, ErrorFragments.WORD_NOT_FOUND.getFragmentInstance(), ErrorFragments.WORD_NOT_FOUND.name())
+                        .commit();
             } else {
                 // parser exception and others
                 Log.e(LOG_TAG, "Parser exception", e);
-                //TODO
+                getSupportFragmentManager().beginTransaction()
+                        .replace(detailFragmentContainerId, ErrorFragments.WORD_NOT_FOUND.getFragmentInstance(), ErrorFragments.WORD_NOT_FOUND.name())
+                        .commit();
             }
         }
     }
