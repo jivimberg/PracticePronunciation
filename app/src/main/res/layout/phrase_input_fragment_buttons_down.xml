@@ -9,9 +9,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
-    android:background="@color/app_fg"
-    android:elevation="5dp"
-    android:translationZ="5dp">
+    android:background="@color/app_fg">
 
     <LinearLayout
         android:layout_width="fill_parent"

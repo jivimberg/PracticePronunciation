@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +20,6 @@ import java.io.IOException;
 public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback {
 
     public static final String LOG_TAG = "MainActivity";
-    public static final String ERROR_NO_NETWORK_TAG = "ERROR_NO_NETWORK";
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
