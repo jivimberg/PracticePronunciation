@@ -24,7 +24,6 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
     private boolean isPhone = true;
-    private DetailErrorFragment noWifiErrorFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +46,6 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             isPhone = false;
             detailFragmentContainerId = R.id.detail_fragment_container;
         }
-
-        noWifiErrorFragment = DetailErrorFragment.newInstance(R.drawable.ic_device_signal_wifi_off);
-
     }
 
     @Override

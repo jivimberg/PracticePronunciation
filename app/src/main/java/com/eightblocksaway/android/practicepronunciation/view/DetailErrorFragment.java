@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,9 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
-import com.eightblocksaway.android.practicepronunciation.model.Phrase;
-
-import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -23,10 +21,12 @@ import org.jetbrains.annotations.NotNull;
 public class DetailErrorFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String IMG_SRC_ID = "param2";
+    private static final String IMG_SRC_ID = "img_src_id";
+    private static final String TEXT_STRING_ID = "text_string_id";
 
     // TODO: Rename and change types of parameters
-    private int img_src_id = R.drawable.ic_device_signal_wifi_off;
+    private Drawable errorIcon;
+    private String errorText;
 
 
     /**
@@ -36,10 +36,11 @@ public class DetailErrorFragment extends Fragment {
      * @return A new instance of fragment DetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DetailErrorFragment newInstance(int drawableId) {
+    public static DetailErrorFragment newInstance(int drawableId, int stringId) {
         DetailErrorFragment fragment = new DetailErrorFragment();
         Bundle args = new Bundle();
         args.putInt(IMG_SRC_ID, drawableId);
+        args.putInt(TEXT_STRING_ID, stringId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,7 +53,8 @@ public class DetailErrorFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            img_src_id = getArguments().getInt(IMG_SRC_ID);
+            errorIcon = getResources().getDrawable(getArguments().getInt(IMG_SRC_ID));
+            errorText = getResources().getString(getArguments().getInt(TEXT_STRING_ID));
         }
     }
 
@@ -63,7 +65,10 @@ public class DetailErrorFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.detail_error_fragment, container, false);
 
         ImageView icon = (ImageView) rootView.findViewById(R.id.error_icon);
-        icon.setImageDrawable(getResources().getDrawable(img_src_id));
+        icon.setImageDrawable(errorIcon);
+
+        TextView text = (TextView) rootView.findViewById(R.id.error_text);
+        text.setText(errorText);
 
         return rootView;
     }
