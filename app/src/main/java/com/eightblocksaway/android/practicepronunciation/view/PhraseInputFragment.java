@@ -30,8 +30,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.R;
+import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
+import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 import com.eightblocksaway.android.practicepronunciation.network.PhraseDataHandler;
 import com.eightblocksaway.android.practicepronunciation.network.PhraseFetchAsyncTask;
@@ -64,6 +66,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private boolean ttsInitialized = false;
     private TextView pronunciationAlphabetLabel;
     private PhraseDataHandler phraseDataHandler;
+    private Phrase currentPhrase;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,6 +95,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                 if(!previousPhrase.equals(phrase)){
                     pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
                     pronunciationAlphabetLabel.setText("");
+                    currentPhrase = null;
                     //change remove button back to +
                     removeButton.setVisibility(View.GONE);
                     addButton.setVisibility(View.VISIBLE);
@@ -153,14 +157,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContentValues phraseValues = new ContentValues();
-                phraseValues.put(PronunciationContract.PhraseEntry.COLUMN_TEXT, getCurrentPhrase());
-                phraseValues.put(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
-                String pronunciation = pronunciationAlphabetLabel.getText().toString().trim();
-                if(!TextUtils.isEmpty(pronunciation)){
-                    phraseValues.put(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION, pronunciation);
-                }
-
+                ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
                 getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
 
                 //hide soft keyboard
@@ -185,12 +182,14 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         return rootView;
     }
 
-    public void setPhrase(String phrase){
+    public void setPhraseText(@NotNull String phrase){
         editText.setText(phrase);
     }
 
-    public void setPronunciation(@NotNull String pronunciation) {
-        pronunciationAlphabetLabel.setText(pronunciation);
+    public void setPhrase(@NotNull Phrase phrase) {
+        currentPhrase = phrase;
+        //set pronunciation
+        pronunciationAlphabetLabel.setText(phrase.getPronunciation());
         pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
     }
 

@@ -1,15 +1,26 @@
 package com.eightblocksaway.android.practicepronunciation.data;
 
+import android.content.ContentValues;
+import android.text.TextUtils;
 import android.text.format.Time;
+
+import com.eightblocksaway.android.practicepronunciation.model.Definition;
+import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+import com.eightblocksaway.android.practicepronunciation.model.Syllable;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class DataUtil {
 
     public static final String SYLLABLE_SEPARATOR = "-";
-    public static final String DEFINITION_SEPARATOR = " ### ";
-    public static final String INTERNAL_DEFINITION_SEPARATOR = " :: ";
+    public static final String DEFINITION_SEPARATOR = "###";
+    public static final String INTERNAL_DEFINITION_SEPARATOR = "::";
 
-    public static final String STRESS_SYMBOL = "*";
-    public static final String SECONDARY_STRESS_SYMBOL = "**";
+    public static final String STRESS_SYMBOL = "*1";
+    public static final String SECONDARY_STRESS_SYMBOL = "*2";
+    public static final String NONE_STRESS_SYMBOL = "*0";
 
     // To make it easy to query for the exact date, we normalize all dates that go into
     // the database to the start of the the Julian day at UTC.
@@ -19,5 +30,53 @@ public class DataUtil {
         time.setToNow();
         int julianDay = Time.getJulianDay(startDate, time.gmtoff);
         return time.setJulianDay(julianDay);
+    }
+
+    public static ContentValues toContentValues(@NotNull Phrase phrase) {
+        ContentValues result = new ContentValues();
+        result.put(PronunciationContract.PhraseEntry.COLUMN_TEXT, phrase.getPhrase());
+        result.put(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
+        result.put(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION, phrase.getPronunciation());
+        result.put(PronunciationContract.PhraseEntry.COLUMN_DEFINITIONS, encodeDefinitions(phrase.getDefinitions()));
+        result.put(PronunciationContract.PhraseEntry.COLUMN_HYPHENATION, encodeHyphenation(phrase.getHyphenation()));
+        return result;
+    }
+
+    private static String encodeDefinitions(@NotNull List<Definition> definitions) {
+        StringBuilder sb = new StringBuilder();
+        for (Definition definition : definitions) {
+            sb.append(definition.getPartOfSpeech());
+            sb.append(INTERNAL_DEFINITION_SEPARATOR);
+            sb.append(definition.getDefinition());
+            sb.append(DEFINITION_SEPARATOR);
+        }
+
+        //remove last separator
+        sb.delete(sb.length() - DEFINITION_SEPARATOR.length(), sb.length());
+        return sb.toString();
+    }
+
+    private static String encodeHyphenation(@NotNull List<Syllable> hyphenation) {
+        StringBuilder sb = new StringBuilder();
+        for (Syllable syllable : hyphenation) {
+            sb.append(syllable.getText());
+            switch (syllable.getStress()){
+                case PRIMARY_STRESS:
+                    sb.append(STRESS_SYMBOL);
+                    break;
+                case SECONDARY_STRESS:
+                    sb.append(SECONDARY_STRESS_SYMBOL);
+                    break;
+                case NONE:
+                    sb.append(NONE_STRESS_SYMBOL);
+                    break;
+            }
+            sb.append(SYLLABLE_SEPARATOR);
+        }
+
+        //remove last separator
+        sb.delete(sb.length() - SYLLABLE_SEPARATOR.length(), sb.length());
+
+        return sb.toString();
     }
 }

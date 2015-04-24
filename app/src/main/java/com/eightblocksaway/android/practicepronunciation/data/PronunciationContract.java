@@ -50,6 +50,8 @@ public class PronunciationContract {
     public static final class PhraseEntry implements BaseColumns {
         public static final String TABLE_NAME = "phrase";
         public static final String COLUMN_TEXT = "text";
+            public static final String COLUMN_HYPHENATION = "hyphenation";
+        public static final String COLUMN_DEFINITIONS = "definition";
         public static final String COLUMN_MASTERY_LEVEL = "masteryLevel";
         public static final String COLUMN_PRONUNCIATION = "pronunciation";
 

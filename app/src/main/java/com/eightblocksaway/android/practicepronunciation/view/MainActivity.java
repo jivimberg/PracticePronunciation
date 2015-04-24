@@ -1,7 +1,6 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 import android.content.Intent;
-import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,14 +57,14 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             String receivedType = intent.getType();
             if(receivedType.startsWith("text/plain")){
                 String receivedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-                phraseInputFragment.setPhrase(receivedText);
+                phraseInputFragment.setPhraseText(receivedText);
             }
         }
     }
 
     @Override
     public void onPhraseSelected(String phrase) {
-        phraseInputFragment.setPhrase(phrase);
+        phraseInputFragment.setPhraseText(phrase);
 
         detailFragment = new DetailFragment();
         //TODO implement
@@ -82,7 +81,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
         if(asyncTaskResult.wasSuccessfull()) {
             Phrase phrase = asyncTaskResult.getResult();
             //set pronunciation
-            phraseInputFragment.setPronunciation(phrase.getPronunciation());
+            phraseInputFragment.setPhrase(phrase);
 
             //set detail fragment
             if (detailFragment != null && detailFragment.isVisible()) {
