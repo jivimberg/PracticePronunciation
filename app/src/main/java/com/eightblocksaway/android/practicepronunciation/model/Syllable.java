@@ -1,8 +1,11 @@
 package com.eightblocksaway.android.practicepronunciation.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.jetbrains.annotations.NotNull;
 
-public final class Syllable {
+public final class Syllable implements Parcelable {
     private final String text;
     private final Stress stress;
 
@@ -49,40 +52,32 @@ public final class Syllable {
                 '}';
     }
 
-    public enum Stress {
-        PRIMARY_STRESS("*1"),
-        SECONDARY_STRESS("*2"),
-        NONE("*0");
-
-        private final String symbol;
-
-        private Stress(@NotNull String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-
-        public static Stress fromString(String stressType){
-            switch (stressType){
-                case "stress":
-                    return PRIMARY_STRESS;
-                case "secondary stress":
-                    return SECONDARY_STRESS;
-                default:
-                    return NONE;
-            }
-        }
-
-        public static Stress fromSymbol(String symbol){
-            for (Stress stress : Stress.values()) {
-                if(stress.getSymbol().equals(symbol)){
-                    return stress;
-                }
-            }
-
-            throw new IllegalArgumentException("No Stress found for symbol " + symbol);
-        }
+    protected Syllable(Parcel in) {
+        text = in.readString();
+        stress = (Stress) in.readValue(Stress.class.getClassLoader());
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(text);
+        dest.writeValue(stress);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Syllable> CREATOR = new Parcelable.Creator<Syllable>() {
+        @Override
+        public Syllable createFromParcel(Parcel in) {
+            return new Syllable(in);
+        }
+
+        @Override
+        public Syllable[] newArray(int size) {
+            return new Syllable[size];
+        }
+    };
 }

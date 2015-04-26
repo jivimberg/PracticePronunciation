@@ -65,10 +65,6 @@ public class PronunciationContract {
         public static Uri builPhraseUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        public static long getIdFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(1));
-        }
     }
 
     /* Inner class that defines the table contents of the attempt table */

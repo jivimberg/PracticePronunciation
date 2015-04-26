@@ -1,10 +1,14 @@
 package com.eightblocksaway.android.practicepronunciation.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public final class Phrase {
+public final class Phrase implements Parcelable{
 
     private final String phrase;
     private final List<Definition> definitions;
@@ -67,4 +71,57 @@ public final class Phrase {
                 ", pronunciation='" + pronunciation + '\'' +
                 '}';
     }
+
+    protected Phrase(Parcel in) {
+        phrase = in.readString();
+        if (in.readByte() == 0x01) {
+            definitions = new ArrayList<Definition>();
+            in.readList(definitions, Definition.class.getClassLoader());
+        } else {
+            definitions = null;
+        }
+        if (in.readByte() == 0x01) {
+            hyphenation = new ArrayList<Syllable>();
+            in.readList(hyphenation, Syllable.class.getClassLoader());
+        } else {
+            hyphenation = null;
+        }
+        pronunciation = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(phrase);
+        if (definitions == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(definitions);
+        }
+        if (hyphenation == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(hyphenation);
+        }
+        dest.writeString(pronunciation);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Phrase> CREATOR = new Parcelable.Creator<Phrase>() {
+        @Override
+        public Phrase createFromParcel(Parcel in) {
+            return new Phrase(in);
+        }
+
+        @Override
+        public Phrase[] newArray(int size) {
+            return new Phrase[size];
+        }
+    };
 }

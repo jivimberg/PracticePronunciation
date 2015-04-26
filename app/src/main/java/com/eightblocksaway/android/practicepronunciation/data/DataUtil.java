@@ -7,6 +7,7 @@ import android.text.format.Time;
 
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+import com.eightblocksaway.android.practicepronunciation.model.Stress;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
 import org.jetbrains.annotations.NotNull;
@@ -114,7 +115,7 @@ public class DataUtil {
         for (String syllableString : syllables) {
             String symbol = syllableString.substring(syllableString.length() - STRESS_SYMBOL.length());
             String syllable = syllableString.substring(0, syllableString.length() - STRESS_SYMBOL.length());
-            result.add(new Syllable(syllable, Syllable.Stress.fromSymbol(symbol)));
+            result.add(new Syllable(syllable, Stress.fromSymbol(symbol)));
         }
 
         return result;

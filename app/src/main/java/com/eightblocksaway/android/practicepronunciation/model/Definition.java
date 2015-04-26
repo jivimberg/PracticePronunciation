@@ -1,8 +1,11 @@
 package com.eightblocksaway.android.practicepronunciation.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.jetbrains.annotations.NotNull;
 
-public final class Definition {
+public final class Definition implements Parcelable {
     private final String partOfSpeech;
     private final String definition;
 
@@ -48,4 +51,33 @@ public final class Definition {
                 ", definition='" + definition + '\'' +
                 '}';
     }
+
+    protected Definition(Parcel in) {
+        partOfSpeech = in.readString();
+        definition = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(partOfSpeech);
+        dest.writeString(definition);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Definition> CREATOR = new Parcelable.Creator<Definition>() {
+        @Override
+        public Definition createFromParcel(Parcel in) {
+            return new Definition(in);
+        }
+
+        @Override
+        public Definition[] newArray(int size) {
+            return new Definition[size];
+        }
+    };
 }

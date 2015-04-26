@@ -20,6 +20,8 @@ import com.eightblocksaway.android.practicepronunciation.data.PronunciationContr
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -65,9 +67,8 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if(cursor != null){
-                    String phrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
-                    Uri uri = PronunciationContract.PhraseEntry.builPhraseUri(id);
-                    callback.onPhraseSelected(phrase, uri);
+                    Phrase phrase = DataUtil.fromCursor(cursor);
+                    callback.onPhraseSelected(phrase);
                 }
             }
         });
@@ -103,7 +104,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onPhraseSelected(String phrase, Uri uri);
+        public void onPhraseSelected(@NotNull Phrase phrase);
     }
 
     @Override

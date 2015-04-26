@@ -61,10 +61,10 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     }
 
     @Override
-    public void onPhraseSelected(String phrase, Uri uri) {
-        phraseInputFragment.setPhraseText(phrase);
+    public void onPhraseSelected(@NotNull Phrase phrase) {
+        phraseInputFragment.setPhraseText(phrase.getPhrase());
 
-        detailFragment = DetailFragment.newInstance(uri);
+        detailFragment = DetailFragment.newInstance(phrase);
         //TODO implement
         //fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()

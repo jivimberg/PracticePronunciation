@@ -62,10 +62,6 @@ public class PronunciationProvider extends ContentProvider {
             PhraseEntry.TABLE_NAME+
                     "." + PhraseEntry.COLUMN_TEXT + " = ? ";
 
-    public static final String phraseById =
-            PhraseEntry.TABLE_NAME+
-                    "." + PhraseEntry._ID + " = ? ";
-
     private Cursor getAttemptsByPhrase(Uri uri, String[] projection, String sortOrder) {
         String[] selectionArgs = new String[]{AttemptEntry.getPhraseFromUri(uri)};
         String selection = phraseByTextSelector;
@@ -94,7 +90,6 @@ public class PronunciationProvider extends ContentProvider {
         // 2) Use the addURI function to match each of the types.  Use the constants from
         // PronunciationContract to help define the types to the UriMatcher.
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PHRASE, PHRASE);
-        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PHRASE + "/#", PHRASE_ID);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_ATTEMPT, ATTEMPT);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_ATTEMPT + "/*", ATTEMPTS_WITH_PHRASE);
 
@@ -155,19 +150,6 @@ public class PronunciationProvider extends ContentProvider {
                         projection,
                         selection,
                         selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            }
-            // "phrase id"
-            case PHRASE_ID: {
-                retCursor = dbHelper.getReadableDatabase().query(
-                        PhraseEntry.TABLE_NAME,
-                        projection,
-                        phraseById,
-                        new String[]{ Long.valueOf(PronunciationContract.PhraseEntry.getIdFromUri(uri)).toString() },
                         null,
                         null,
                         sortOrder

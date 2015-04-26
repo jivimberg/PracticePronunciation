@@ -64,11 +64,15 @@ public class DetailErrorFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.detail_error_fragment, container, false);
 
-        ImageView icon = (ImageView) rootView.findViewById(R.id.error_icon);
-        icon.setImageDrawable(errorIcon);
+        if(errorIcon != null){
+            ImageView icon = (ImageView) rootView.findViewById(R.id.error_icon);
+            icon.setImageDrawable(errorIcon);
+        }
 
-        TextView text = (TextView) rootView.findViewById(R.id.error_text);
-        text.setText(errorText);
+        if(errorText != null){
+            TextView text = (TextView) rootView.findViewById(R.id.error_text);
+            text.setText(errorText);
+        }
 
         return rootView;
     }

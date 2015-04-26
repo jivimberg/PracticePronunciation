@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
+import com.eightblocksaway.android.practicepronunciation.model.Stress;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
 import org.json.JSONArray;
@@ -45,7 +46,7 @@ public class FetchHyphenation extends FetchCommand<List<Syllable>>{
             if(syllable.has("type")){
                 typeValue = syllable.getString("type");
             }
-            Syllable.Stress type = Syllable.Stress.fromString(typeValue);
+            Stress type = Stress.fromString(typeValue);
             result.add(new Syllable(text, type));
         }
         Log.i(LOG_TAG, "Returning hyphenation " + result);
