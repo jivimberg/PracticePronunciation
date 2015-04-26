@@ -29,7 +29,6 @@ import org.w3c.dom.Text;
 public class DetailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String PHRASE = "phrase";
-    private static final int LOADER_ID = 2;
 
     private Phrase phrase;
 
@@ -74,10 +73,4 @@ public class DetailFragment extends Fragment {
 
     }
 
-
-    //TODO move this to use bundle!
-    public void setPhrase(@NotNull Phrase phrase) {
-        TextView textView = (TextView) getActivity().findViewById(R.id.textview);
-        textView.setText(phrase.getDefinitions().toString());
-    }
 }

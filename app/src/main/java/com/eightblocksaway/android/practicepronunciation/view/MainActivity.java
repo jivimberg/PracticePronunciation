@@ -36,7 +36,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.multi_fragment_container, new PhraseListFragment())
+                        .replace(R.id.multi_fragment_container, new PhraseListFragment())
                         .commit();
             }
         } else {
@@ -65,8 +65,6 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
         phraseInputFragment.setPhraseText(phrase.getPhrase());
 
         detailFragment = DetailFragment.newInstance(phrase);
-        //TODO implement
-        //fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
                 .replace(detailFragmentContainerId, detailFragment)
                 .addToBackStack(null)
@@ -83,8 +81,11 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
             //set detail fragment
             if (detailFragment != null && detailFragment.isVisible()) {
-                //TODO should use bundles instead
-                detailFragment.setPhrase(phrase);
+                detailFragment = DetailFragment.newInstance(phrase);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(detailFragmentContainerId, detailFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         } else {
             @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -95,18 +96,21 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
                 Log.i(LOG_TAG, "Network error");
                 getSupportFragmentManager().beginTransaction()
                         .replace(detailFragmentContainerId, ErrorFragments.NO_WIFI.getFragmentInstance(), ErrorFragments.NO_WIFI.name())
+                        .addToBackStack(null)
                         .commit();
             } else if (e instanceof FetchCommand.EmptyResponseException) {
                 // word not found
                 Log.i(LOG_TAG, "Word not found");
                 getSupportFragmentManager().beginTransaction()
                         .replace(detailFragmentContainerId, ErrorFragments.WORD_NOT_FOUND.getFragmentInstance(), ErrorFragments.WORD_NOT_FOUND.name())
+                        .addToBackStack(null)
                         .commit();
             } else {
                 // parser exception and others
                 Log.e(LOG_TAG, "Parser exception", e);
                 getSupportFragmentManager().beginTransaction()
                         .replace(detailFragmentContainerId, ErrorFragments.WORD_NOT_FOUND.getFragmentInstance(), ErrorFragments.WORD_NOT_FOUND.name())
+                        .addToBackStack(null)
                         .commit();
             }
         }
