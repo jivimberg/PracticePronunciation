@@ -50,7 +50,19 @@ public final class Syllable {
     }
 
     public enum Stress {
-        PRIMARY_STRESS, SECONDARY_STRESS, NONE;
+        PRIMARY_STRESS("*1"),
+        SECONDARY_STRESS("*2"),
+        NONE("*0");
+
+        private final String symbol;
+
+        private Stress(@NotNull String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
 
         public static Stress fromString(String stressType){
             switch (stressType){
@@ -61,6 +73,16 @@ public final class Syllable {
                 default:
                     return NONE;
             }
+        }
+
+        public static Stress fromSymbol(String symbol){
+            for (Stress stress : Stress.values()) {
+                if(stress.getSymbol().equals(symbol)){
+                    return stress;
+                }
+            }
+
+            throw new IllegalArgumentException("No Stress found for symbol " + symbol);
         }
     }
 }

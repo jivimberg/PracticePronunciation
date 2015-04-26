@@ -14,8 +14,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
+import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
+import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 
 /**
@@ -59,9 +61,14 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO change this to send only URI and use loaders?
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                String phrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
-                callback.onPhraseSelected(phrase);
+                if(cursor != null){
+                    String phrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
+                    Uri uri = PronunciationContract.PhraseEntry.builPhraseUri(id);
+                    callback.onPhraseSelected(phrase, uri);
+                }
             }
         });
 
@@ -96,7 +103,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onPhraseSelected(String phrase);
+        public void onPhraseSelected(String phrase, Uri uri);
     }
 
     @Override

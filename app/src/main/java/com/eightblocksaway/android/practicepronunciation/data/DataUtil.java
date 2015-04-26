@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation.data;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.text.TextUtils;
 import android.text.format.Time;
 
@@ -10,7 +11,10 @@ import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class DataUtil {
 
@@ -78,5 +82,41 @@ public class DataUtil {
         sb.delete(sb.length() - SYLLABLE_SEPARATOR.length(), sb.length());
 
         return sb.toString();
+    }
+
+    public static Phrase fromCursor(@NotNull Cursor cursor) {
+        String phrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
+        String pronunciation = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION));
+        String definitionsString = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_DEFINITIONS));
+        List<Definition> definitions = decodeDefinitions(definitionsString);
+        String hyphenationString = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_HYPHENATION));
+        List<Syllable> hyphenation = decodeHyphenation(hyphenationString);
+        return new Phrase(phrase, pronunciation, definitions, hyphenation);
+    }
+
+    private static List<Definition> decodeDefinitions(@NotNull String definitionsString) {
+        List<Definition> result = new ArrayList<>();
+
+        //TODO optimize with compiled patterns?
+        List<String> definitions = Arrays.asList(definitionsString.split(DEFINITION_SEPARATOR));
+        for (String definitionString : definitions) {
+            String[] definitionArray = definitionString.split(INTERNAL_DEFINITION_SEPARATOR);
+            result.add(new Definition(definitionArray[1], definitionArray[0]));
+        }
+
+        return result;
+    }
+
+    private static List<Syllable> decodeHyphenation(@NotNull String hyphenationString) {
+        List<Syllable> result = new ArrayList<>();
+
+        List<String> syllables = Arrays.asList(hyphenationString.split(SYLLABLE_SEPARATOR));
+        for (String syllableString : syllables) {
+            String symbol = syllableString.substring(syllableString.length() - STRESS_SYMBOL.length());
+            String syllable = syllableString.substring(0, syllableString.length() - STRESS_SYMBOL.length());
+            result.add(new Syllable(syllable, Syllable.Stress.fromSymbol(symbol)));
+        }
+
+        return result;
     }
 }

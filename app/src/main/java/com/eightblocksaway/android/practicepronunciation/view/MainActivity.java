@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +23,6 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
-    private boolean isPhone = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,6 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
         if(findViewById(R.id.multi_fragment_container) != null){
             //phone
-            isPhone = true;
             detailFragmentContainerId = R.id.multi_fragment_container;
 
             if (savedInstanceState == null) {
@@ -42,7 +41,6 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             }
         } else {
             //tablet
-            isPhone = false;
             detailFragmentContainerId = R.id.detail_fragment_container;
         }
     }
@@ -63,10 +61,10 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
     }
 
     @Override
-    public void onPhraseSelected(String phrase) {
+    public void onPhraseSelected(String phrase, Uri uri) {
         phraseInputFragment.setPhraseText(phrase);
 
-        detailFragment = new DetailFragment();
+        detailFragment = DetailFragment.newInstance(uri);
         //TODO implement
         //fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
@@ -85,6 +83,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
             //set detail fragment
             if (detailFragment != null && detailFragment.isVisible()) {
+                //TODO should use bundles instead
                 detailFragment.setPhrase(phrase);
             }
         } else {
