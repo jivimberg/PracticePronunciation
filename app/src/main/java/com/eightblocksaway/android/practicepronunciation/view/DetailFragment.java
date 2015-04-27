@@ -1,21 +1,30 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 
+import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Html;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
+import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+import com.eightblocksaway.android.practicepronunciation.model.Stress;
+import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Text;
@@ -65,8 +74,51 @@ public class DetailFragment extends Fragment {
         View root = inflater.inflate(R.layout.detail_fragment, container, false);
 
         if(phrase != null){
-            TextView textView = (TextView) root.findViewById(R.id.textview);
-            textView.setText(phrase.getDefinitions().toString());
+            //set phrase
+//            TextView textView = (TextView) root.findViewById(R.id.phraseText);
+//            textView.setText(phrase.getPhrase());
+
+            //set hyphenation
+            LinearLayout hyphenation = (LinearLayout) root.findViewById(R.id.hyphenationList);
+            for (Syllable syllable : phrase.getHyphenation()) {
+                TextView syllableTV = new TextView(getActivity());
+                syllableTV.setText(syllable.getText());
+                syllableTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                syllableTV.setTextColor(Color.BLACK);
+                if(syllable.getStress().equals(Stress.PRIMARY_STRESS)){
+                    syllableTV.setTypeface(Typeface.DEFAULT_BOLD);
+                    syllableTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                }
+                hyphenation.addView(syllableTV);
+
+                //TODO move to a layout and inflate?
+                TextView separator = new TextView(getActivity());
+                separator.setText("●");
+                separator.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 8);
+                separator.setPadding(20, 20, 20, 20);
+                separator.setTextColor(Color.BLACK);
+                hyphenation.addView(separator);
+            }
+
+            //remove last separator
+            hyphenation.removeViewAt(hyphenation.getChildCount() - 1);
+
+
+            //set definitions
+            LinearLayout definitionList = (LinearLayout) root.findViewById(R.id.definitionList);
+            int definitionCount = 1;
+            for (Definition definition : phrase.getDefinitions()) {
+                View definitionLayout = getLayoutInflater(null).inflate(R.layout.definition, null);
+
+                TextView definitionNumber = (TextView) definitionLayout.findViewById(R.id.definitionNumber);
+                definitionNumber.setText(Integer.toString(definitionCount++));
+
+                TextView definitionTV = (TextView) definitionLayout.findViewById(R.id.definition);
+                definitionTV.setText(Html.fromHtml("<i>" + definition.getPartOfSpeech() + ".</i> "
+                        + "<font color=\"black\">" + definition.getDefinition() + "</font>"));
+
+                definitionList.addView(definitionLayout);
+            }
         }
 
         return root;

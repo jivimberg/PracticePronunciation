@@ -17,5 +17,7 @@
     <string name="no_wifi_text">We couldn\'t reach the server</string>
     <string name="word_not_found_text">We couldn\'t find that phrase</string>
     <string name="app_error_text">Oops something went wrong</string>
+    <string name="dictionary">DICTIONARY</string>
+    <string name="hyphenation">HYPHENATION</string>
 
 </resources>

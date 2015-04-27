@@ -1,16 +1,53 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/app_fg"
-    android:layout_marginBottom="8dp"
-    android:padding="16dp"
-    tools:context="com.eightblocksaway.android.practicepronunciation.view.DetailFragment">
+    android:layout_height="wrap_content">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:id="@+id/textview"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/lorem_ipsum" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/app_fg"
+        android:layout_marginBottom="8dp"
+        android:padding="16dp"
+        tools:context="com.eightblocksaway.android.practicepronunciation.view.DetailFragment">
 
-</FrameLayout>
+        <!--<TextView android:id="@+id/phraseText"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="32sp"-->
+            <!--android:text="@string/phrase_placeholder"-->
+            <!--android:paddingBottom="15dp"/>-->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@string/hyphenation" />
+
+        <LinearLayout
+            android:id="@+id/hyphenationList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@string/dictionary" />
+
+        <LinearLayout
+            android:id="@+id/definitionList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
