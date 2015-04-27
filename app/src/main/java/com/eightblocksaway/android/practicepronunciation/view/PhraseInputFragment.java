@@ -15,6 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -165,6 +166,10 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                 //hide soft keyboard
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
+                //change add button to -
+                addButton.setVisibility(View.GONE);
+                removeButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -191,8 +196,11 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     public void setPhrase(@NotNull Phrase phrase) {
         currentPhrase = phrase;
         //set pronunciation
-        pronunciationAlphabetLabel.setText(phrase.getPronunciation());
+        pronunciationAlphabetLabel.setText(Html.fromHtml(phrase.getPronunciation()));
         pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
+
+        //enable add button
+        addButton.setEnabled(true);
     }
 
     private String getCurrentPhrase() {
@@ -221,7 +229,6 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             listenButton.setEnabled(true);
         if(speechRecognitionInitialized)
             speakButton.setEnabled(true);
-        addButton.setEnabled(true);
         clearEditText.setEnabled(true);
         clearEditText.setVisibility(View.VISIBLE);
     }
