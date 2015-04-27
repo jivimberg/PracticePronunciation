@@ -80,13 +80,11 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             phraseInputFragment.setPhrase(phrase);
 
             //set detail fragment
-            if (detailFragment != null && detailFragment.isVisible()) {
-                detailFragment = DetailFragment.newInstance(phrase);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(detailFragmentContainerId, detailFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+            detailFragment = DetailFragment.newInstance(phrase);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(detailFragmentContainerId, detailFragment)
+                    .addToBackStack(null)
+                    .commit();
         } else {
             @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
             Exception e = asyncTaskResult.getError();
