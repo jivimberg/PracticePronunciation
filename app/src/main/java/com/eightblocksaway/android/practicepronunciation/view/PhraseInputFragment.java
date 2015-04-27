@@ -67,6 +67,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private TextView pronunciationAlphabetLabel;
     private PhraseDataHandler phraseDataHandler;
     private Phrase currentPhrase;
+    private Callback callback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -104,6 +105,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
                 if(phrase.length() == 0){
                     dissableButtons();
+                    callback.onEmptyText();
                 } else {
                     enableButtons();
 
@@ -368,6 +370,32 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             toast.show();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onEmptyText();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            callback = (Callback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement Callback");
+        }
     }
 
     @Override

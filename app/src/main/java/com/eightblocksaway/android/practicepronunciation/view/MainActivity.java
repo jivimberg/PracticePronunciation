@@ -1,9 +1,8 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
 import com.eightblocksaway.android.practicepronunciation.R;
@@ -17,12 +16,14 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 
-public class MainActivity extends ActionBarActivity implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback {
+public class MainActivity extends ActionBarActivity
+        implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback, PhraseInputFragment.Callback{
 
     public static final String LOG_TAG = "MainActivity";
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
+    private boolean isPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
 
         if(findViewById(R.id.multi_fragment_container) != null){
             //phone
+            isPhone = true;
             detailFragmentContainerId = R.id.multi_fragment_container;
 
             if (savedInstanceState == null) {
@@ -41,6 +43,7 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
             }
         } else {
             //tablet
+            isPhone = false;
             detailFragmentContainerId = R.id.detail_fragment_container;
         }
     }
@@ -111,6 +114,16 @@ public class MainActivity extends ActionBarActivity implements PhraseListFragmen
                         .addToBackStack(null)
                         .commit();
             }
+        }
+    }
+
+    @Override
+    public void onEmptyText() {
+        if(isPhone){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.multi_fragment_container, new PhraseListFragment())
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 }

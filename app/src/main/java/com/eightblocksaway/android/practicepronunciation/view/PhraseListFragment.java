@@ -117,7 +117,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
             callback = (Callback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
+                    + " must implement Callback");
         }
     }
 
