@@ -95,47 +95,49 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                 final String phrase = s.toString().trim();
 
                 if(!previousPhrase.equals(phrase)){
+                    previousPhrase = phrase;
+
                     pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
                     pronunciationAlphabetLabel.setText("");
                     currentPhrase = null;
                     //change remove button back to +
                     removeButton.setVisibility(View.GONE);
                     addButton.setVisibility(View.VISIBLE);
-                }
-                previousPhrase = phrase;
 
-                if(phrase.length() == 0){
-                    dissableButtons();
-                    callback.onEmptyText();
-                } else {
-                    enableButtons();
+                    if(phrase.length() == 0){
+                        dissableButtons();
+                        callback.onEmptyText();
+                    } else {
+                        enableButtons();
 
-                    //TODO this should be moved out of here
-                    Cursor cursor = null;
-                    try{
-                        cursor = getActivity().getContentResolver().query(PronunciationContract.PhraseEntry.CONTENT_URI,
-                                new String[]{PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION},
-                                PronunciationProvider.phraseByTextSelector,
-                                new String[]{phrase},
-                                null);
+                        //TODO this should be moved out of here
+                        Cursor cursor = null;
+                        try{
+                            cursor = getActivity().getContentResolver().query(PronunciationContract.PhraseEntry.CONTENT_URI,
+                                    null,
+                                    PronunciationProvider.phraseByTextSelector,
+                                    new String[]{phrase},
+                                    null);
 
-                        if(cursor.moveToFirst()){
-                            //word from DB
-                            String string = cursor.getString(0);
-                            updatePronunciationLabel(string);
+                            if(cursor.moveToFirst()){
+                                //word from DB
+                                Phrase phraseFromDB = DataUtil.fromCursor(cursor);
 
-                            //change add button for remove button
-                            addButton.setVisibility(View.GONE);
-                            removeButton.setVisibility(View.VISIBLE);
+                                //change add button for remove button
+                                addButton.setVisibility(View.GONE);
+                                removeButton.setVisibility(View.VISIBLE);
+
+                                //Cancel delayed lookups
+                                phraseDataHandler.removeMessages();
+                                callback.onPhraseFromDB(phraseFromDB);
+                            } else {
+                                //word not on DB
+                                phraseDataHandler.triggerFetch(phrase, DELAY);
+                            }
+                        } finally {
+                            if(cursor != null && !cursor.isClosed())
+                                cursor.close();
                         }
-
-                        if(TextUtils.isEmpty(pronunciationAlphabetLabel.getText().toString().trim())){
-                            //word not on DB
-                            phraseDataHandler.triggerFetch(phrase, DELAY);
-                        }
-                    } finally {
-                        if(cursor != null && !cursor.isClosed())
-                            cursor.close();
                     }
                 }
             }
@@ -205,13 +207,6 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     private String getCurrentPhrase() {
         return editText.getText().toString().trim();
-    }
-
-    private void updatePronunciationLabel(String string) {
-        if(!TextUtils.isEmpty(string)){
-            pronunciationAlphabetLabel.setText(string);
-            pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override
@@ -389,6 +384,8 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
          * DetailFragmentCallback for when an item has been selected.
          */
         public void onEmptyText();
+
+        void onPhraseFromDB(@NotNull Phrase phrase);
     }
 
     @Override

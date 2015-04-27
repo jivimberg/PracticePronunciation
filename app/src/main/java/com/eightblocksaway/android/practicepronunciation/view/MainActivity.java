@@ -65,7 +65,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onPhraseSelected(@NotNull Phrase phrase) {
-        phraseInputFragment.setPhraseText(phrase.getPhrase());
+        phraseInputFragment.setPhrase(phrase);
 
         detailFragment = DetailFragment.newInstance(phrase);
         getSupportFragmentManager().beginTransaction()
@@ -125,5 +125,10 @@ public class MainActivity extends ActionBarActivity
                     .addToBackStack(null)
                     .commit();
         }
+    }
+
+    @Override
+    public void onPhraseFromDB(@NotNull Phrase phrase) {
+        onPhraseSelected(phrase);
     }
 }

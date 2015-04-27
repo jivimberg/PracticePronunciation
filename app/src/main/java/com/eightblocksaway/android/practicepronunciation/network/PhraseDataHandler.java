@@ -26,6 +26,10 @@ public class PhraseDataHandler extends Handler {
         sendMessageDelayed(newMessage, delay);
     }
 
+    public void removeMessages(){
+        removeMessages(FETCH_DATA);
+    }
+
     @Override
     public void handleMessage(Message msg)
     {
