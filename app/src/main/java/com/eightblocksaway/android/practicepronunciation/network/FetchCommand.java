@@ -17,6 +17,7 @@ import java.net.URL;
 public abstract class FetchCommand<T> {
     private static final String LOG_TAG = "FetchCommand";
     protected static final String BASE_URI = "http://api.wordnik.com:80/v4/word.json/";
+    protected static final String API_KEY = "f4e175385742da274a23a0f99b20c521488ff167472c614f5";
     private final Uri uri;
     private final String phrase;
 

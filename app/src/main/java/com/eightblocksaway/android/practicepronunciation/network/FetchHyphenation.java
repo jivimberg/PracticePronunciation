@@ -29,7 +29,7 @@ public class FetchHyphenation extends FetchCommand<List<Syllable>>{
                 .appendPath("hyphenation")
                 .appendQueryParameter("useCanonical", "false")
                 .appendQueryParameter("limit", "15")
-                .appendQueryParameter("api_key", "a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5")
+                .appendQueryParameter("api_key", API_KEY)
                 .build();
         return new FetchHyphenation(builtUri, phrase);
     }

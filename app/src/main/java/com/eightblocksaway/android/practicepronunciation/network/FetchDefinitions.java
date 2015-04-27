@@ -28,7 +28,7 @@ public class FetchDefinitions extends FetchCommand<List<Definition>>{
                 .appendPath("definitions")
                 .appendQueryParameter("useCanonical", "false")
                 .appendQueryParameter("limit", "5")
-                .appendQueryParameter("api_key", "a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5")
+                .appendQueryParameter("api_key", API_KEY)
                 .build();
         return new FetchDefinitions(builtUri, phrase);
     }
