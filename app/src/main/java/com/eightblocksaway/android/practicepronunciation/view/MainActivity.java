@@ -65,6 +65,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onPhraseSelected(@NotNull Phrase phrase) {
+        Log.i(LOG_TAG, "Phrase selected from list: " + phrase);
         phraseInputFragment.setPhrase(phrase);
 
         detailFragment = DetailFragment.newInstance(phrase);
@@ -76,13 +77,11 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onPhraseFetch(@NotNull AsyncTaskResult<Phrase> asyncTaskResult){
-
         if(asyncTaskResult.wasSuccessfull()) {
             Phrase phrase = asyncTaskResult.getResult();
-            //set pronunciation
+            Log.i(LOG_TAG, "Receiving successful fetch for phrase: " + phrase);
             phraseInputFragment.setPhrase(phrase);
 
-            //set detail fragment
             detailFragment = DetailFragment.newInstance(phrase);
             getSupportFragmentManager().beginTransaction()
                     .replace(detailFragmentContainerId, detailFragment)

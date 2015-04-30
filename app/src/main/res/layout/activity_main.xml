@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.eightblocksaway.android.practicepronunciation.view.PhraseInputFragment"
-        tools:layout="@layout/phrase_input_fragment_buttons_down" />
+        tools:layout="@layout/phrase_input_fragment" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/multi_fragment_container"

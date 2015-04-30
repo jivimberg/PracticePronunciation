@@ -1,16 +1,10 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 
-import android.content.res.ColorStateList;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -20,14 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
-import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.eightblocksaway.android.practicepronunciation.model.Stress;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 
 /**
@@ -47,7 +39,7 @@ public class DetailFragment extends Fragment {
      *
      * @return A new instance of fragment DetailFragment.
      */
-    public static DetailFragment newInstance(Phrase phrase) {
+    public static DetailFragment newInstance(@NotNull Phrase phrase) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(PHRASE, phrase);

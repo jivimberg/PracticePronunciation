@@ -62,6 +62,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private ImageButton removeButton;
     private ImageButton clearEditText;
     private EditText editText;
+    private String previousInput = "";
 
     private boolean speechRecognitionInitialized = false;
     private boolean ttsInitialized = false;
@@ -76,13 +77,13 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         View rootView = inflater.inflate(R.layout.phrase_input_fragment, container, false);
 
         pronunciationAlphabetLabel = (TextView) rootView.findViewById(R.id.pronunciation_alphabet_label);
+        editText = (EditText) rootView.findViewById(R.id.editText);
 
         phraseDataHandler = new PhraseDataHandler((PhraseFetchAsyncTask.Callback) getActivity());
 
         editText = (EditText) rootView.findViewById(R.id.editText);
         editText.addTextChangedListener(new TextWatcher() {
             private final long DELAY = 1000; // in ms
-            public String previousPhrase = "";
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -92,10 +93,10 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
             @Override
             public void afterTextChanged(Editable s) {
-                final String phrase = s.toString().trim();
+                final String currentInput = s.toString().trim();
 
-                if(!previousPhrase.equals(phrase)){
-                    previousPhrase = phrase;
+                if(!previousInput.equals(currentInput)){
+                    previousInput = currentInput;
 
                     pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
                     pronunciationAlphabetLabel.setText("");
@@ -104,7 +105,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                     removeButton.setVisibility(View.GONE);
                     addButton.setVisibility(View.VISIBLE);
 
-                    if(phrase.length() == 0){
+                    if(currentInput.length() == 0){
                         dissableButtons();
                         callback.onEmptyText();
                     } else {
@@ -116,7 +117,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                             cursor = getActivity().getContentResolver().query(PronunciationContract.PhraseEntry.CONTENT_URI,
                                     null,
                                     PronunciationProvider.phraseByTextSelector,
-                                    new String[]{phrase},
+                                    new String[]{currentInput},
                                     null);
 
                             if(cursor.moveToFirst()){
@@ -132,7 +133,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                                 callback.onPhraseFromDB(phraseFromDB);
                             } else {
                                 //word not on DB
-                                phraseDataHandler.triggerFetch(phrase, DELAY);
+                                phraseDataHandler.triggerFetch(currentInput, DELAY);
                             }
                         } finally {
                             if(cursor != null && !cursor.isClosed())
@@ -198,6 +199,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     public void setPhrase(@NotNull Phrase phrase) {
         currentPhrase = phrase;
         //set pronunciation
+        setPhraseText(phrase.getPhrase());
         pronunciationAlphabetLabel.setText(Html.fromHtml(phrase.getPronunciation()));
         pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
 
