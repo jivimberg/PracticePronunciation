@@ -41,6 +41,7 @@ public class PronunciationProvider extends ContentProvider {
     private PronunciationDbHelper dbHelper;
 
     static final int PHRASE = 100;
+    static final int PHRASE_ID = 101;
     static final int ATTEMPT = 200;
     static final int ATTEMPTS_WITH_PHRASE = 201;
 

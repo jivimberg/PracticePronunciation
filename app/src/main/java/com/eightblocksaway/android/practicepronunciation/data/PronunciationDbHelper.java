@@ -49,6 +49,8 @@ public class PronunciationDbHelper extends SQLiteOpenHelper {
                 // the ID of the location entry associated with this weather data
                 PhraseEntry.COLUMN_TEXT + " TEXT NOT NULL, " +
                 PhraseEntry.COLUMN_PRONUNCIATION + " TEXT, " +
+                PhraseEntry.COLUMN_DEFINITIONS + " TEXT, " +
+                PhraseEntry.COLUMN_HYPHENATION + " TEXT, " +
                 PhraseEntry.COLUMN_MASTERY_LEVEL + " INTEGER NOT NULL, " +
 
                 // To assure the application have just one weather entry per day

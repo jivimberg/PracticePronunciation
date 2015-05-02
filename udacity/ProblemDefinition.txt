@@ -1,0 +1,8 @@
+Problem Description
+
+As most non native English speaker I've struggle with English pronunciation for a long time. At the same time I was starting Android Fundamentals I sign up for a course on English Speaking skills. Most of the homework for that course was to practice pronouncing particular words that presented a challenge to me. A couple of weeks into the course I found myself carrying a stack of post-its notes with the words I was learning and kept repeating them all day long without having any actual feedback that I was getting it right. That's when I thought there has to be an app for this. And that's how "Practice Pronunciation" was born.
+
+With this app anyone learning English can have a virtual teacher in his pocket to know how to say any word and hear them spelled (even without having an Internet connection!). Users can also make lists of words they are trying to master and practice them. The app will tell them if he got the pronunciation right, wrong or perfect and give them points for how good he did. 
+
+Furthermore searching for a word will show you the spelling using the International Phonetic Alphabet (which you don't have to be an expert to find it useful), show you where the stress is in a word and it's different definitions. Finally the app blends into the system providing the user the ability to highlight words on any other app and using the share function to look up the word and how to pronounce it.
+
