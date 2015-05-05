@@ -67,8 +67,8 @@ public class DetailFragment extends Fragment {
 
         if(phrase != null){
             //set phrase
-//            TextView textView = (TextView) root.findViewById(R.id.phraseText);
-//            textView.setText(phrase.getPhrase());
+            TextView textView = (TextView) root.findViewById(R.id.phraseText);
+            textView.setText(phrase.getPhrase());
 
             //set hyphenation
             LinearLayout hyphenation = (LinearLayout) root.findViewById(R.id.hyphenationList);
