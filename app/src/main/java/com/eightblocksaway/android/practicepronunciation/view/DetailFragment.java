@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ public class DetailFragment extends Fragment {
     private static final String PHRASE = "phrase";
 
     private Phrase phrase;
+    private PhraseSelectCallback callback;
 
     /**
      * Use this factory method to create a new instance of
@@ -69,6 +71,12 @@ public class DetailFragment extends Fragment {
             //set phrase
             TextView textView = (TextView) root.findViewById(R.id.phraseText);
             textView.setText(phrase.getPhrase());
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callback.onPhraseSelected(phrase);
+                }
+            });
 
             //set hyphenation
             LinearLayout hyphenation = (LinearLayout) root.findViewById(R.id.hyphenationList);
@@ -115,6 +123,20 @@ public class DetailFragment extends Fragment {
 
         return root;
 
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            callback = (PhraseSelectCallback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement Callback");
+        }
     }
 
 }

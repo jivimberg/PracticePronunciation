@@ -17,7 +17,7 @@ import java.io.IOException;
 
 
 public class MainActivity extends ActionBarActivity
-        implements PhraseListFragment.Callback, PhraseFetchAsyncTask.Callback, PhraseInputFragment.Callback{
+        implements PhraseSelectCallback, PhraseFetchAsyncTask.Callback, PhraseInputFragment.Callback {
 
     public static final String LOG_TAG = "MainActivity";
     private PhraseInputFragment phraseInputFragment;

@@ -19,6 +19,7 @@
             android:text="@string/phrase_placeholder"
             android:textStyle="bold"
             android:textColor="@color/app_fg"
+            android:clickable="true"
             android:padding="15dp" />
 
         <LinearLayout

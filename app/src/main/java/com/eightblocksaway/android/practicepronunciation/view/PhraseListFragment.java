@@ -20,8 +20,6 @@ import com.eightblocksaway.android.practicepronunciation.data.PronunciationContr
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -32,7 +30,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
     private static final String LOG_TAG = "PhraseListFragment";
 
     private PhrasesCursorAdapter phrasesCursorAdapter;
-    private Callback callback;
+    private PhraseSelectCallback callback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,18 +93,6 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         phrasesCursorAdapter.swapCursor(null);
     }
 
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        public void onPhraseSelected(@NotNull Phrase phrase);
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -114,7 +100,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            callback = (Callback) activity;
+            callback = (PhraseSelectCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement Callback");
