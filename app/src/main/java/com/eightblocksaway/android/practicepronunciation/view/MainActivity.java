@@ -67,12 +67,6 @@ public class MainActivity extends ActionBarActivity
     public void onPhraseSelected(@NotNull Phrase phrase) {
         Log.i(LOG_TAG, "Phrase selected from list: " + phrase);
         phraseInputFragment.setPhrase(phrase);
-
-        detailFragment = DetailFragment.newInstance(phrase);
-        getSupportFragmentManager().beginTransaction()
-                .replace(detailFragmentContainerId, detailFragment)
-                .addToBackStack(null)
-                .commit();
     }
 
     @Override
@@ -129,5 +123,12 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onPhraseFromDB(@NotNull Phrase phrase) {
         onPhraseSelected(phrase);
+
+        //Add detail fragment
+        detailFragment = DetailFragment.newInstance(phrase);
+        getSupportFragmentManager().beginTransaction()
+                .replace(detailFragmentContainerId, detailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
