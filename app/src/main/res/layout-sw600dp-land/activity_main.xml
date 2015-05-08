@@ -24,7 +24,7 @@
         <fragment
             android:id="@+id/phrase_list_fragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:name="com.eightblocksaway.android.practicepronunciation.view.PhraseListFragment"
             tools:layout="@layout/phrase_list_fragment"
             android:layout_below="@+id/phrase_input_fragment" />

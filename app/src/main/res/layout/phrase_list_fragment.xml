@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
+<FrameLayout
+    android:id="@+id/phrase_list_fragment"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/phrase_list_fragment"
-    android:background="@color/app_fg"
-    android:drawSelectorOnTop="true"
-    android:layout_gravity="center_horizontal"/>
+    android:layout_height="wrap_content" >
+
+    <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/phrase_list"
+        android:background="@color/app_fg"
+        android:drawSelectorOnTop="true"
+        android:layout_gravity="center_horizontal"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/empty_list_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/app_background"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        tools:context="com.eightblocksaway.android.practicepronunciation.view.DetailFragment">
+
+        <!-- TODO: Update blank fragment layout -->
+        <ImageView android:id="@+id/error_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_action_subject" />
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:text="@string/list_placeholder_text"/>
+
+    </LinearLayout>
+</FrameLayout>

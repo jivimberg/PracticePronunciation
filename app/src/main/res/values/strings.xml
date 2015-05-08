@@ -19,5 +19,6 @@
     <string name="app_error_text">Oops something went wrong</string>
     <string name="dictionary">DICTIONARY</string>
     <string name="hyphenation">HYPHENATION</string>
+    <string name="list_placeholder_text">Your training list is empty</string>
 
 </resources>

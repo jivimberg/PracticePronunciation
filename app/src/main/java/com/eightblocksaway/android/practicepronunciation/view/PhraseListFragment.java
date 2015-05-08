@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
@@ -35,9 +36,10 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.phrase_list_fragment, container, false);
+        FrameLayout rootView = (FrameLayout) inflater.inflate(R.layout.phrase_list_fragment, container, false);
 
-        DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list_fragment);
+        DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list);
+        phraseList.setEmptyView(rootView.findViewById(R.id.empty_list_placeholder));
 //            phraseList.enableSwipeToDismiss(
 //                    new OnDismissCallback() {
 //                        @Override
@@ -64,7 +66,7 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if(cursor != null){
+                if (cursor != null) {
                     Phrase phrase = DataUtil.fromCursor(cursor);
                     callback.onPhraseSelected(phrase);
                 }
