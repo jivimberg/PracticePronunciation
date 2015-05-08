@@ -9,6 +9,8 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
+    android:layout_marginBottom="1dp"
+    android:elevation="1dp"
     android:background="@color/app_fg">
 
     <LinearLayout

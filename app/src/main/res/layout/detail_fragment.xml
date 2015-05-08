@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:background="@color/app_fg"
         android:layout_marginBottom="8dp"
+        android:elevation="1dp"
         tools:context="com.eightblocksaway.android.practicepronunciation.view.DetailFragment">
 
         <TextView android:id="@+id/phraseText"
