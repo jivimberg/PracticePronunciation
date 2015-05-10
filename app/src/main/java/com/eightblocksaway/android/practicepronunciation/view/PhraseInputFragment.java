@@ -1,6 +1,7 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -270,7 +271,12 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private void enableTTS() {
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-        startActivityForResult(checkIntent, TTS_CHECK_CODE);
+        try{
+            startActivityForResult(checkIntent, TTS_CHECK_CODE);
+        } catch (ActivityNotFoundException e){
+            Log.d(LOG_TAG, "No TTS engine on this device", e);
+            Toast.makeText(getActivity(), R.string.TTS_no_available, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -302,19 +308,26 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                         }
 
                         @Override
-                        public void onError(String utteranceId) {}
+                        public void onError(String utteranceId) {
+                        }
                     });
+
+                    if(!editText.getText().toString().isEmpty()){
+                        listenButton.setEnabled(true);
+                    }
                 }
 
-                if(!editText.getText().toString().isEmpty()){
-                    listenButton.setEnabled(true);
-                }
             } else {
-                // missing data, install it
-                Intent installIntent = new Intent();
-                installIntent.setAction(
-                        TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(installIntent);
+                try{
+                    // missing data, install it
+                    Intent installIntent = new Intent();
+                    installIntent.setAction(
+                            TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startActivity(installIntent);
+                } catch (ActivityNotFoundException e){
+                    Log.d(LOG_TAG, "No TTS engine on this device", e);
+                    Toast.makeText(getActivity(), R.string.TTS_no_available, Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
