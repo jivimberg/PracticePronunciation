@@ -166,6 +166,8 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                 ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
                 getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
 
+                Toast.makeText(getActivity(), getString(R.string.phrase_saved_toast), Toast.LENGTH_SHORT).show();
+
                 //hide soft keyboard
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);

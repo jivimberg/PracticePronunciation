@@ -20,5 +20,6 @@
     <string name="dictionary">DICTIONARY</string>
     <string name="hyphenation">HYPHENATION</string>
     <string name="list_placeholder_text">Your training list is empty</string>
+    <string name="phrase_saved_toast">Word added to your list</string>
 
 </resources>
