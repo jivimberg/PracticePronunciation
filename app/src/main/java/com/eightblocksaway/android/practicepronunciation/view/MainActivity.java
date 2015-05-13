@@ -85,7 +85,7 @@ public class MainActivity extends ActionBarActivity
             getSupportFragmentManager().beginTransaction()
                     .replace(detailFragmentContainerId, detailFragment)
                     .addToBackStack(null)
-                    .commit();
+                    .commitAllowingStateLoss();
         } else {
             @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
             Exception e = asyncTaskResult.getError();
