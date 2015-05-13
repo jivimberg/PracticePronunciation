@@ -34,9 +34,11 @@
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:inputType="textShortMessage"
                 android:ems="10"
                 android:textSize="32sp"
+                android:singleLine="true"
+                android:imeOptions="actionSearch"
                 android:hint="@string/pronounce_hint"
                 android:id="@+id/editText" />
 

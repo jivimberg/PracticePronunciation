@@ -1,9 +1,12 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
@@ -71,6 +74,8 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onPhraseFetch(@NotNull AsyncTaskResult<Phrase> asyncTaskResult){
+        hideKeyboard();
+
         if(asyncTaskResult.wasSuccessfull()) {
             Phrase phrase = asyncTaskResult.getResult();
             Log.i(LOG_TAG, "Receiving successful fetch for phrase: " + phrase);
@@ -91,21 +96,21 @@ public class MainActivity extends ActionBarActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(detailFragmentContainerId, ErrorFragments.NO_WIFI.getFragmentInstance(), ErrorFragments.NO_WIFI.name())
                         .addToBackStack(null)
-                        .commit();
+                        .commitAllowingStateLoss();
             } else if (e instanceof FetchCommand.EmptyResponseException) {
                 // word not found
                 Log.i(LOG_TAG, "Word not found");
                 getSupportFragmentManager().beginTransaction()
                         .replace(detailFragmentContainerId, ErrorFragments.WORD_NOT_FOUND.getFragmentInstance(), ErrorFragments.WORD_NOT_FOUND.name())
                         .addToBackStack(null)
-                        .commit();
+                        .commitAllowingStateLoss();
             } else {
                 // parser exception and others
                 Log.e(LOG_TAG, "Parser exception", e);
                 getSupportFragmentManager().beginTransaction()
                         .replace(detailFragmentContainerId, ErrorFragments.WORD_NOT_FOUND.getFragmentInstance(), ErrorFragments.WORD_NOT_FOUND.name())
                         .addToBackStack(null)
-                        .commit();
+                        .commitAllowingStateLoss();
             }
         }
     }
@@ -130,5 +135,14 @@ public class MainActivity extends ActionBarActivity
                 .replace(detailFragmentContainerId, detailFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void hideKeyboard() {
+        // Check if no view has focus:
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 }
