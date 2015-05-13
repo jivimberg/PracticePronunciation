@@ -105,9 +105,9 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                     //change remove button back to +
                     removeButton.setVisibility(View.GONE);
                     addButton.setVisibility(View.VISIBLE);
+                    dissableButtons();
 
                     if(currentInput.length() == 0){
-                        dissableButtons();
                         callback.onEmptyText();
                     } else {
                         enableButtons();
@@ -164,18 +164,22 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
-                getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
+                if(currentPhrase != null){
+                    ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
+                    getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
 
-                Toast.makeText(getActivity(), getString(R.string.phrase_saved_toast), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.phrase_saved_toast), Toast.LENGTH_SHORT).show();
 
-                //hide soft keyboard
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                    //hide soft keyboard
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
-                //change add button to -
-                addButton.setVisibility(View.GONE);
-                removeButton.setVisibility(View.VISIBLE);
+                    //change add button to -
+                    addButton.setVisibility(View.GONE);
+                    removeButton.setVisibility(View.VISIBLE);
+                } else {
+                    Log.e(LOG_TAG, "Illegal state. Current phrase is null");
+                }
             }
         });
 
