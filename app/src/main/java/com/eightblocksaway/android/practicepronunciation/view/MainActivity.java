@@ -145,4 +145,11 @@ public class MainActivity extends ActionBarActivity
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        phraseInputFragment.setPhraseText("");
+    }
 }
