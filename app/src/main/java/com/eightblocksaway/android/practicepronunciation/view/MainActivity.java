@@ -3,6 +3,7 @@ package com.eightblocksaway.android.practicepronunciation.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,7 @@ public class MainActivity extends ActionBarActivity
         implements PhraseSelectCallback, PhraseFetchAsyncTask.Callback, PhraseInputFragment.Callback {
 
     public static final String LOG_TAG = "MainActivity";
+    private static final String LIST_FRAG = "LIST_FRAG";
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
@@ -118,6 +120,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onEmptyText() {
         if(isPhone){
+            //TODO
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.multi_fragment_container, new PhraseListFragment())
                     .addToBackStack(null)
@@ -148,8 +151,15 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d(LOG_TAG, "backStackEntryCount: " + backStackEntryCount);
+        if(backStackEntryCount > 0){
+            getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        } else {
+            super.onBackPressed();
+        }
 
-        phraseInputFragment.setPhraseText("");
+        //TODO This is causing the list fragment to be added again..
+//        phraseInputFragment.setPhraseText("");
     }
 }
