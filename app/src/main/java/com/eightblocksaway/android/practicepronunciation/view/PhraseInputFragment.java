@@ -67,6 +67,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     private boolean speechRecognitionInitialized = false;
     private boolean ttsInitialized = false;
+    private boolean ignoreEvents = false;
     private TextView pronunciationAlphabetLabel;
     private PhraseDataHandler phraseDataHandler;
     private Phrase currentPhrase;
@@ -108,7 +109,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                     dissableButtons();
 
                     if(currentInput.length() == 0){
-                        callback.onEmptyText();
+                        if(!ignoreEvents) callback.onEmptyText();
                     } else {
                         enableButtons();
 
@@ -130,17 +131,23 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                                 removeButton.setVisibility(View.VISIBLE);
 
                                 //Cancel delayed lookups
-                                phraseDataHandler.removeMessages();
-                                callback.onPhraseFromDB(phraseFromDB);
+                                if(!ignoreEvents) {
+                                    phraseDataHandler.removeMessages();
+                                    callback.onPhraseFromDB(phraseFromDB);
+                                }
                             } else {
                                 //word not on DB
-                                phraseDataHandler.triggerFetch(currentInput, DELAY);
+                                if(!ignoreEvents) phraseDataHandler.triggerFetch(currentInput, DELAY);
                             }
                         } finally {
                             if(cursor != null && !cursor.isClosed())
                                 cursor.close();
                         }
                     }
+                }
+
+                if(ignoreEvents){
+                    ignoreEvents = false;
                 }
             }
         });
@@ -199,14 +206,15 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         return rootView;
     }
 
-    public void setPhraseText(@NotNull String phrase){
+    public void setPhraseText(@NotNull String phrase, boolean ignoreEvents){
+        this.ignoreEvents = ignoreEvents;
         editText.setText(phrase);
     }
 
     public void setPhrase(@NotNull Phrase phrase) {
         currentPhrase = phrase;
         //set pronunciation
-        setPhraseText(phrase.getPhrase());
+        setPhraseText(phrase.getPhrase(), false);
         pronunciationAlphabetLabel.setText(Html.fromHtml(phrase.getPronunciation()));
         pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
 

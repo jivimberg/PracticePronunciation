@@ -24,7 +24,6 @@ public class MainActivity extends ActionBarActivity
         implements PhraseSelectCallback, PhraseFetchAsyncTask.Callback, PhraseInputFragment.Callback {
 
     public static final String LOG_TAG = "MainActivity";
-    private static final String LIST_FRAG = "LIST_FRAG";
     private PhraseInputFragment phraseInputFragment;
     private int detailFragmentContainerId;
     private DetailFragment detailFragment;
@@ -63,7 +62,7 @@ public class MainActivity extends ActionBarActivity
             String receivedType = intent.getType();
             if(receivedType.startsWith("text/plain")){
                 String receivedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-                phraseInputFragment.setPhraseText(receivedText);
+                phraseInputFragment.setPhraseText(receivedText, false);
             }
         }
     }
@@ -120,11 +119,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onEmptyText() {
         if(isPhone){
-            //TODO
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.multi_fragment_container, new PhraseListFragment())
-                    .addToBackStack(null)
-                    .commit();
+            onBackPressed();
         }
     }
 
@@ -159,7 +154,6 @@ public class MainActivity extends ActionBarActivity
             super.onBackPressed();
         }
 
-        //TODO This is causing the list fragment to be added again..
-//        phraseInputFragment.setPhraseText("");
+        phraseInputFragment.setPhraseText("", true);
     }
 }
