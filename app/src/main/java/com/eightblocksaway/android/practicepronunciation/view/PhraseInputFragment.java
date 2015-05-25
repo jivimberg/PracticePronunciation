@@ -207,8 +207,10 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     }
 
     public void setPhraseText(@NotNull String phrase, boolean ignoreEvents){
-        this.ignoreEvents = ignoreEvents;
-        editText.setText(phrase);
+        if(!getCurrentPhrase().equals(phrase)){
+            this.ignoreEvents = ignoreEvents;
+            editText.setText(phrase);
+        }
     }
 
     public void setPhrase(@NotNull Phrase phrase) {

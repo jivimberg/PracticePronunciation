@@ -75,8 +75,6 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onPhraseFetch(@NotNull AsyncTaskResult<Phrase> asyncTaskResult){
-        hideKeyboard();
-
         if(asyncTaskResult.wasSuccessfull()) {
             Phrase phrase = asyncTaskResult.getResult();
             Log.i(LOG_TAG, "Receiving successful fetch for phrase: " + phrase);
@@ -133,15 +131,6 @@ public class MainActivity extends ActionBarActivity
                 .replace(detailFragmentContainerId, detailFragment)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    private void hideKeyboard() {
-        // Check if no view has focus:
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
     }
 
     @Override
