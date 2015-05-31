@@ -12,11 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
+import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 import com.eightblocksaway.android.practicepronunciation.model.Stress;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
@@ -34,6 +36,8 @@ public class DetailFragment extends Fragment {
 
     private Phrase phrase;
     private PhraseSelectCallback callback;
+    private TextView detailPointsText;
+    private ProgressBar detailPointsBar;
 
     /**
      * Use this factory method to create a new instance of
@@ -77,6 +81,20 @@ public class DetailFragment extends Fragment {
                     callback.onPhraseSelected(phrase);
                 }
             });
+
+            if(phrase.isPersisted()){
+                TextView detailPointsLabel = (TextView) root.findViewById(R.id.detail_points_label);
+                detailPointsLabel.setVisibility(View.VISIBLE);
+                LinearLayout detailPointsLayout = (LinearLayout) root.findViewById(R.id.detail_points_layout);
+                detailPointsLayout.setVisibility(View.VISIBLE);
+
+                int points = phrase.getPoints();
+                detailPointsText = (TextView) root.findViewById(R.id.detail_points_text);
+                detailPointsText.setText(points + "/" + getActivity().getResources().getInteger(R.integer.max_points));
+
+                detailPointsBar = (ProgressBar) root.findViewById(R.id.detail_points_bar);
+                detailPointsBar.setProgress(points);
+            }
 
             //set hyphenation
             LinearLayout hyphenation = (LinearLayout) root.findViewById(R.id.hyphenationList);

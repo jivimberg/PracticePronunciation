@@ -65,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:max="@integer/max_points"
                     android:progress="7"
-                    style="@android:style/Widget.ProgressBar.Horizontal"/>
+                    style="@android:style/Widget.Material.ProgressBar.Horizontal"/>
             </LinearLayout>
 
             <TextView

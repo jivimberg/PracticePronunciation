@@ -51,7 +51,7 @@
             android:id="@+id/mastery_level_progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:max="10"
+            android:max="@integer/max_points"
             android:progress="7"
             style="@android:style/Widget.Material.ProgressBar.Horizontal"/>
     </LinearLayout>

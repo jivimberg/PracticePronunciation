@@ -37,7 +37,8 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
         int masteryLevel = cursor.getInt(columnMasteryLevelIndex);
 
         TextView masteryLevelTextView = (TextView) view.findViewById(R.id.mastery_level);
-        masteryLevelTextView.setText(masteryLevel + "/" + PronunciationRecognitionResult.MAX_SCORE);
+        int maxScore = context.getResources().getInteger(R.integer.max_points);
+        masteryLevelTextView.setText(masteryLevel + "/" + maxScore);
 
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.mastery_level_progress_bar);
         progressBar.setProgress(masteryLevel);

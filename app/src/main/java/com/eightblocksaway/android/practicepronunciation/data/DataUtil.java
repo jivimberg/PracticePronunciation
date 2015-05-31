@@ -2,7 +2,6 @@ package com.eightblocksaway.android.practicepronunciation.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.text.format.Time;
 
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
@@ -15,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
+
+import static com.eightblocksaway.android.practicepronunciation.data.PronunciationContract.PhraseEntry;
 
 public class DataUtil {
 
@@ -39,11 +39,11 @@ public class DataUtil {
 
     public static ContentValues toContentValues(@NotNull Phrase phrase) {
         ContentValues result = new ContentValues();
-        result.put(PronunciationContract.PhraseEntry.COLUMN_TEXT, phrase.getPhrase());
-        result.put(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
-        result.put(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION, phrase.getPronunciation());
-        result.put(PronunciationContract.PhraseEntry.COLUMN_DEFINITIONS, encodeDefinitions(phrase.getDefinitions()));
-        result.put(PronunciationContract.PhraseEntry.COLUMN_HYPHENATION, encodeHyphenation(phrase.getHyphenation()));
+        result.put(PhraseEntry.COLUMN_TEXT, phrase.getPhrase());
+        result.put(PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
+        result.put(PhraseEntry.COLUMN_PRONUNCIATION, phrase.getPronunciation());
+        result.put(PhraseEntry.COLUMN_DEFINITIONS, encodeDefinitions(phrase.getDefinitions()));
+        result.put(PhraseEntry.COLUMN_HYPHENATION, encodeHyphenation(phrase.getHyphenation()));
         return result;
     }
 
@@ -86,13 +86,14 @@ public class DataUtil {
     }
 
     public static Phrase fromCursor(@NotNull Cursor cursor) {
-        String phrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
-        String pronunciation = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION));
-        String definitionsString = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_DEFINITIONS));
+        String phrase = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_TEXT));
+        String pronunciation = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_PRONUNCIATION));
+        String definitionsString = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_DEFINITIONS));
         List<Definition> definitions = decodeDefinitions(definitionsString);
-        String hyphenationString = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_HYPHENATION));
+        String hyphenationString = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_HYPHENATION));
         List<Syllable> hyphenation = decodeHyphenation(hyphenationString);
-        return new Phrase(phrase, pronunciation, definitions, hyphenation);
+        int points = cursor.getInt(cursor.getColumnIndex(PhraseEntry.COLUMN_MASTERY_LEVEL));
+        return Phrase.createPersisted(phrase, pronunciation, definitions, hyphenation, points);
     }
 
     private static List<Definition> decodeDefinitions(@NotNull String definitionsString) {

@@ -59,6 +59,17 @@ public class EspressoTest {
          */
         Thread.sleep(1200);
 
+        // check buttons become enabled
+        onView(withId(R.id.listen_button)).check(matches(isEnabled()));
+
+        /**
+         * No voice recognition support on the emulator
+         */
+        //onView(withId(R.id.speak_button)).check(matches(isEnabled()));
+
+        // check add button
+        onView(withId(R.id.add_button)).check(matches(isEnabled()));
+
         // check that the fragment is actually displayed
         onView(withId(R.id.phraseText)).check(matches(isDisplayed()));
         onView(withId(R.id.phraseText)).check(matches(withText(phrase)));
