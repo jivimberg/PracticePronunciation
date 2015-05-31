@@ -131,6 +131,13 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
+    public void onPhraseAdded(@NotNull Phrase phrase) {
+        if(detailFragment != null){
+            detailFragment.onPhraseAdded(phrase);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
         Log.d(LOG_TAG, "backStackEntryCount: " + backStackEntryCount);

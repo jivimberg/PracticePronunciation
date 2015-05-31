@@ -175,13 +175,16 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                     ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
                     getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
 
+                    currentPhrase = Phrase.toPersisted(currentPhrase);
+                    callback.onPhraseAdded(currentPhrase);
+
                     Toast.makeText(getActivity(), getString(R.string.phrase_saved_toast), Toast.LENGTH_SHORT).show();
 
                     //hide soft keyboard
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
-                    //change add button to -
+                    //change + button to -
                     addButton.setVisibility(View.GONE);
                     removeButton.setVisibility(View.VISIBLE);
                 } else {
@@ -414,9 +417,11 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onEmptyText();
+        void onEmptyText();
 
         void onPhraseFromDB(@NotNull Phrase phrase);
+
+        void onPhraseAdded(@NotNull Phrase phrase);
     }
 
     @Override

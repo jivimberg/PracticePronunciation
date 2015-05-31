@@ -2,10 +2,15 @@ package com.eightblocksaway.android.practicepronunciation.view;
 
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -16,6 +21,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
+import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
@@ -30,14 +38,14 @@ import org.jetbrains.annotations.NotNull;
  * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String PHRASE = "phrase";
+    private static final int LOADER_ID = 3;
 
     private Phrase phrase;
     private PhraseSelectCallback callback;
-    private TextView detailPointsText;
-    private ProgressBar detailPointsBar;
+    private View root;
 
     /**
      * Use this factory method to create a new instance of
@@ -69,7 +77,7 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.detail_fragment, container, false);
+        root = inflater.inflate(R.layout.detail_fragment, container, false);
 
         if(phrase != null){
             //set phrase
@@ -83,17 +91,8 @@ public class DetailFragment extends Fragment {
             });
 
             if(phrase.isPersisted()){
-                TextView detailPointsLabel = (TextView) root.findViewById(R.id.detail_points_label);
-                detailPointsLabel.setVisibility(View.VISIBLE);
-                LinearLayout detailPointsLayout = (LinearLayout) root.findViewById(R.id.detail_points_layout);
-                detailPointsLayout.setVisibility(View.VISIBLE);
-
-                int points = phrase.getPoints();
-                detailPointsText = (TextView) root.findViewById(R.id.detail_points_text);
-                detailPointsText.setText(points + "/" + getActivity().getResources().getInteger(R.integer.max_points));
-
-                detailPointsBar = (ProgressBar) root.findViewById(R.id.detail_points_bar);
-                detailPointsBar.setProgress(points);
+                showPoints();
+                getLoaderManager().initLoader(LOADER_ID, null, this);
             }
 
             //set hyphenation
@@ -143,6 +142,29 @@ public class DetailFragment extends Fragment {
 
     }
 
+    private void showPoints() {
+        TextView detailPointsLabel = (TextView) root.findViewById(R.id.detail_points_label);
+        detailPointsLabel.setVisibility(View.VISIBLE);
+        LinearLayout detailPointsLayout = (LinearLayout) root.findViewById(R.id.detail_points_layout);
+        detailPointsLayout.setVisibility(View.VISIBLE);
+
+        int points = phrase.getPoints();
+        TextView detailPointsText = (TextView) root.findViewById(R.id.detail_points_text);
+        detailPointsText.setText(points + "/" + getActivity().getResources().getInteger(R.integer.max_points));
+
+        ProgressBar detailPointsBar = (ProgressBar) root.findViewById(R.id.detail_points_bar);
+        detailPointsBar.setProgress(points);
+    }
+
+    public void onPhraseAdded(@NotNull Phrase phrase){
+        this.phrase = phrase;
+
+        if(phrase.isPersisted()){
+            showPoints();
+            getLoaderManager().initLoader(LOADER_ID, null, this);
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -157,4 +179,26 @@ public class DetailFragment extends Fragment {
         }
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri uri = PronunciationContract.PhraseEntry.CONTENT_URI;
+        return new CursorLoader(getActivity(), uri,
+                null,
+                PronunciationProvider.phraseByTextSelector,
+                new String[] { phrase.getPhrase() }, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(data.moveToFirst()){
+            this.phrase = DataUtil.fromCursor(data);
+            showPoints();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        this.phrase = null;
+        //TODO should I do anything else here?
+    }
 }

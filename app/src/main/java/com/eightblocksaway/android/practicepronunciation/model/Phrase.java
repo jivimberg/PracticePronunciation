@@ -48,6 +48,11 @@ public final class Phrase implements Parcelable{
         return new Phrase(phrase, pronunciation, definitions, hyphenation, false, 0);
     }
 
+    public static Phrase toPersisted(@NotNull Phrase currentPhrase) {
+        return createPersisted(currentPhrase.getPhrase(), currentPhrase.getPronunciation(),
+                currentPhrase.getDefinitions(), currentPhrase.getHyphenation(), 0);
+    }
+
     @NotNull
     public String getPhrase() {
         return phrase;
