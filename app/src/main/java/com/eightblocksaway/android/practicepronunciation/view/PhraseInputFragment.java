@@ -1,5 +1,6 @@
 package com.eightblocksaway.android.practicepronunciation.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
@@ -15,6 +16,8 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -46,6 +49,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -57,156 +65,134 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private static final String LOG_TAG = "PhraseInputFragment";
     private TextToSpeech mTts;
 
-    private ImageButton listenButton;
-    private ImageButton speakButton;
-    private ImageButton addButton;
-    private ImageButton removeButton;
-    private ImageButton clearEditText;
-    private EditText editText;
-    private String previousInput = "";
+    @InjectView(R.id.listen_button) ImageButton listenButton;
+    @InjectView(R.id.speak_button) ImageButton speakButton;
+    @InjectView(R.id.add_button) ImageButton addButton;
+    @InjectView(R.id.remove_button) ImageButton removeButton;
+    @InjectView(R.id.clear_edit_text) ImageButton clearEditText;
+    @InjectView(R.id.edit_text) EditText editText;
+    @InjectView(R.id.pronunciation_alphabet_label) TextView pronunciationAlphabetLabel;
 
+    private String previousInput = "";
     private boolean speechRecognitionInitialized = false;
+
     private boolean ttsInitialized = false;
     private boolean ignoreEvents = false;
-    private TextView pronunciationAlphabetLabel;
     private PhraseDataHandler phraseDataHandler;
     private Phrase currentPhrase;
     private Callback callback;
+
+    public static final long DELAY = 1000;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.phrase_input_fragment, container, false);
-
-        pronunciationAlphabetLabel = (TextView) rootView.findViewById(R.id.pronunciation_alphabet_label);
-        editText = (EditText) rootView.findViewById(R.id.editText);
+        ButterKnife.inject(this, rootView);
 
         phraseDataHandler = new PhraseDataHandler((PhraseFetchAsyncTask.Callback) getActivity());
 
-        editText = (EditText) rootView.findViewById(R.id.editText);
-        editText.addTextChangedListener(new TextWatcher() {
-            private final long DELAY = 1000; // in ms
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                final String currentInput = s.toString().trim();
-
-                if(!previousInput.equals(currentInput)){
-                    previousInput = currentInput;
-
-                    pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
-                    pronunciationAlphabetLabel.setText("");
-                    currentPhrase = null;
-                    //change remove button back to +
-                    removeButton.setVisibility(View.GONE);
-                    addButton.setVisibility(View.VISIBLE);
-                    dissableButtons();
-
-                    if(currentInput.length() == 0){
-                        if(!ignoreEvents) callback.onEmptyText();
-                    } else {
-                        enableButtons();
-
-                        //TODO this should be moved out of here
-                        Cursor cursor = null;
-                        try{
-                            cursor = getActivity().getContentResolver().query(PronunciationContract.PhraseEntry.CONTENT_URI,
-                                    null,
-                                    PronunciationProvider.phraseByTextSelector,
-                                    new String[]{currentInput},
-                                    null);
-
-                            if(cursor.moveToFirst()){
-                                //word from DB
-                                Phrase phraseFromDB = DataUtil.fromCursor(cursor);
-
-                                //change add button for remove button
-                                addButton.setVisibility(View.GONE);
-                                removeButton.setVisibility(View.VISIBLE);
-
-                                //Cancel delayed lookups
-                                if(!ignoreEvents) {
-                                    phraseDataHandler.removeMessages();
-                                    callback.onPhraseFromDB(phraseFromDB);
-                                }
-                            } else {
-                                //word not on DB
-                                if(!ignoreEvents) phraseDataHandler.triggerFetch(currentInput, DELAY);
-                            }
-                        } finally {
-                            if(cursor != null && !cursor.isClosed())
-                                cursor.close();
-                        }
-                    }
-                }
-
-                if(ignoreEvents){
-                    ignoreEvents = false;
-                }
-            }
-        });
-
-        clearEditText = (ImageButton) rootView.findViewById(R.id.clear_editText);
-        clearEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText("");
-            }
-        });
-
-        listenButton = (ImageButton) rootView.findViewById(R.id.listen_button);
         listenButton.setEnabled(false);
-
-        speakButton = (ImageButton) rootView.findViewById(R.id.speak_button);
         speakButton.setEnabled(false);
-
-        addButton = (ImageButton) rootView.findViewById(R.id.add_button);
         addButton.setEnabled(false);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(currentPhrase != null){
-                    ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
-                    getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
-
-                    currentPhrase = Phrase.toPersisted(currentPhrase);
-                    callback.onPhraseAdded(currentPhrase);
-
-                    Toast.makeText(getActivity(), getString(R.string.phrase_saved_toast), Toast.LENGTH_SHORT).show();
-
-                    //hide soft keyboard
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-
-                    //change + button to -
-                    addButton.setVisibility(View.GONE);
-                    removeButton.setVisibility(View.VISIBLE);
-                } else {
-                    Log.e(LOG_TAG, "Illegal state. Current phrase is null");
-                }
-            }
-        });
-
-        removeButton = (ImageButton) rootView.findViewById(R.id.remove_button);
-        removeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String phrase = getCurrentPhrase();
-                getActivity().getContentResolver().delete(PronunciationContract.PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
-                editText.setText("");
-            }
-        });
 
         enableTTS();
         enableSpeechRecognition();
 
         return rootView;
+    }
+
+    @OnClick(R.id.clear_edit_text)
+    void clearText(View v) {
+        editText.setText("");
+    }
+
+    @OnClick(R.id.remove_button)
+    public void removePhrase(View v) {
+        final String phrase = getCurrentPhrase();
+        getActivity().getContentResolver().delete(PronunciationContract.PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
+        editText.setText("");
+    }
+
+    @OnClick(R.id.add_button)
+    void addCurrentPhrase(View v) {
+        if(currentPhrase != null){
+            ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
+            getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
+
+            currentPhrase = Phrase.toPersisted(currentPhrase);
+            callback.onPhraseAdded(currentPhrase);
+
+            Toast.makeText(getActivity(), getString(R.string.phrase_saved_toast), Toast.LENGTH_SHORT).show();
+
+            //hide soft keyboard
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
+            //change + button to -
+            addButton.setVisibility(View.GONE);
+            removeButton.setVisibility(View.VISIBLE);
+        } else {
+            Log.e(LOG_TAG, "Illegal state. Current phrase is null");
+        }
+    }
+
+    @OnTextChanged(value = R.id.edit_text, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterTextChanged(Editable s) {
+        final String currentInput = s.toString().trim();
+
+        if(!previousInput.equals(currentInput)){
+            previousInput = currentInput;
+
+            pronunciationAlphabetLabel.setVisibility(View.INVISIBLE);
+            pronunciationAlphabetLabel.setText("");
+            currentPhrase = null;
+            //change remove button back to +
+            removeButton.setVisibility(View.GONE);
+            addButton.setVisibility(View.VISIBLE);
+            dissableButtons();
+
+            if(currentInput.length() == 0){
+                if(!ignoreEvents) callback.onEmptyText();
+            } else {
+                enableButtons();
+
+                //TODO this should be moved out of here
+                Cursor cursor = null;
+                try{
+                    cursor = getActivity().getContentResolver().query(PronunciationContract.PhraseEntry.CONTENT_URI,
+                            null,
+                            PronunciationProvider.phraseByTextSelector,
+                            new String[]{currentInput},
+                            null);
+
+                    if(cursor.moveToFirst()){
+                        //word from DB
+                        Phrase phraseFromDB = DataUtil.fromCursor(cursor);
+
+                        //change add button for remove button
+                        addButton.setVisibility(View.GONE);
+                        removeButton.setVisibility(View.VISIBLE);
+
+                        //Cancel delayed lookups
+                        if(!ignoreEvents) {
+                            phraseDataHandler.removeMessages();
+                            callback.onPhraseFromDB(phraseFromDB);
+                        }
+                    } else {
+                        //word not on DB
+                        if(!ignoreEvents) phraseDataHandler.triggerFetch(currentInput, DELAY);
+                    }
+                } finally {
+                    if(cursor != null && !cursor.isClosed())
+                        cursor.close();
+                }
+            }
+        }
+
+        if(ignoreEvents){
+            ignoreEvents = false;
+        }
     }
 
     public void setPhraseText(@NotNull String phrase, boolean ignoreEvents){
@@ -234,6 +220,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        ButterKnife.reset(this);
         if(mTts != null){
             Log.d(LOG_TAG, "Shutting down TTS Engine");
             mTts.shutdown();
@@ -298,15 +285,16 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Handle TTS Check
+        final FragmentActivity ctx = getActivity();
         if (requestCode == TTS_CHECK_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 // success, create the TTS instance
-                mTts = new TextToSpeech(getActivity(), this);
+                mTts = new TextToSpeech(ctx, this);
                 if(Build.VERSION.SDK_INT >= 15){
                     mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-                            getActivity().runOnUiThread(new Runnable() {
+                            ctx.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     listenButton.setPressed(true);
@@ -316,7 +304,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
                         @Override
                         public void onDone(String utteranceId) {
-                            getActivity().runOnUiThread(new Runnable() {
+                            ctx.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     listenButton.setPressed(false);
@@ -343,7 +331,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                     startActivity(installIntent);
                 } catch (ActivityNotFoundException e){
                     Log.d(LOG_TAG, "No TTS engine on this device", e);
-                    Toast.makeText(getActivity(), R.string.TTS_no_available, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, R.string.TTS_no_available, Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -359,48 +347,39 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             PronunciationRecognitionResult result = PronunciationRecognitionResult.evaluate(phrase, matches);
             Log.i(PronunciationRecognitionResult.LOG_TAG, "Pronunciation recognition result: " + result);
 
-            //persist result
-                /*
-                int today = Time.getJulianDay(System.currentTimeMillis(), new Time().gmtoff);
-                ContentValues values = new ContentValues();
-                values.put(AttemptEntry.COLUMN_DATE, today);
-                values.put(AttemptEntry.COLUMN_RESULT_ID, result.name());
-                getActivity().getContentResolver().insert(AttemptEntry.buildAttemptWithPhrase(phrase), values);
-                 */
-
             //TODO this should be done in the background
-
             ContentValues values = new ContentValues();
             values.put(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL, result.getScore());
             String pronunciation = pronunciationAlphabetLabel.getText().toString().trim();
             if(!TextUtils.isEmpty(pronunciation)){
                 values.put(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION, pronunciation);
             }
-            getActivity().getContentResolver().update(PronunciationContract.PhraseEntry.CONTENT_URI,
+            ctx.getContentResolver().update(PronunciationContract.PhraseEntry.CONTENT_URI,
                     values, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
 
-            View toastRoot = getActivity().getLayoutInflater().inflate(R.layout.recognition_result_toast_layout, null);
+            @SuppressLint("InflateParams")
+            View toastRoot = ctx.getLayoutInflater().inflate(R.layout.recognition_result_toast_layout, null);
 
-            TextView resultTextView = (TextView) toastRoot.findViewById(R.id.result);
+            TextView resultTextView = ButterKnife.findById(toastRoot, R.id.result);
             resultTextView.setText(result.getDisplayText());
 
-            ImageView icon = (ImageView) toastRoot.findViewById(R.id.icon);
+            ImageView resultIcon = ButterKnife.findById(toastRoot, R.id.result_icon);
             Drawable drawable = null;
             switch (result){
                 case EXCELLENT:
-                    drawable = getActivity().getResources().getDrawable(R.drawable.excellent);
+                    drawable = ContextCompat.getDrawable(ctx, R.drawable.excellent);
                     break;
                 case GOOD:
-                    drawable = getActivity().getResources().getDrawable(R.drawable.good);
+                    drawable = ContextCompat.getDrawable(ctx, R.drawable.good);
                     break;
                 case TRY_AGAIN:
-                    drawable = getActivity().getResources().getDrawable(R.drawable.try_again);
+                    drawable = ContextCompat.getDrawable(ctx, R.drawable.try_again);
                     break;
             }
 
-            icon.setImageDrawable(drawable);
+            resultIcon.setImageDrawable(drawable);
 
-            Toast toast = new Toast(getActivity());
+            Toast toast = new Toast(ctx);
             toast.setView(toastRoot);
             toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 0, 128);
             toast.show();

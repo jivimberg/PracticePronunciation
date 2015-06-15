@@ -29,7 +29,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/clear_editText"
+            android:id="@+id/clear_edit_text"
             android:src="@drawable/ic_navigation_close"
             android:layout_gravity="end"
             android:visibility="invisible"
@@ -47,7 +47,7 @@
         android:singleLine="true"
         android:imeOptions="actionSearch"
         android:hint="@string/pronounce_hint"
-        android:id="@+id/editText" />
+        android:id="@+id/edit_text" />
 
     <LinearLayout
             android:id="@+id/actions"

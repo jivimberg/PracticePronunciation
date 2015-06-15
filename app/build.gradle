@@ -32,6 +32,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:support-v4:22.0.0' // using 22.0 to avoid clash with espresso. Check: http://goo.gl/2L7ER0
     compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.jakewharton:butterknife:6.1.0'
 
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
     androidTestCompile 'com.android.support.test:runner:0.2'

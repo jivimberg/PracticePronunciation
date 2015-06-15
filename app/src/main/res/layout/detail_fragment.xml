@@ -12,7 +12,7 @@
         android:elevation="1dp"
         tools:context="com.eightblocksaway.android.practicepronunciation.view.DetailFragment">
 
-        <TextView android:id="@+id/phraseText"
+        <TextView android:id="@+id/detail_phrase_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="24sp"
@@ -75,7 +75,7 @@
                 android:text="@string/hyphenation" />
 
             <LinearLayout
-                android:id="@+id/hyphenationList"
+                android:id="@+id/hyphenation_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
@@ -90,7 +90,7 @@
                 android:text="@string/dictionary" />
 
             <LinearLayout
-                android:id="@+id/definitionList"
+                android:id="@+id/definition_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"

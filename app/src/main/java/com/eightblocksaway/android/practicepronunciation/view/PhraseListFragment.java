@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,10 @@ import com.eightblocksaway.android.practicepronunciation.data.PronunciationContr
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnItemClick;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -33,13 +38,16 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
     private PhrasesCursorAdapter phrasesCursorAdapter;
     private PhraseSelectCallback callback;
 
+    @InjectView(R.id.phrase_list) DynamicListView phraseList;
+    @InjectView(R.id.empty_list_placeholder) View emptyView;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         FrameLayout rootView = (FrameLayout) inflater.inflate(R.layout.phrase_list_fragment, container, false);
+        ButterKnife.inject(this, rootView);
 
-        DynamicListView phraseList = (DynamicListView) rootView.findViewById(R.id.phrase_list);
-        phraseList.setEmptyView(rootView.findViewById(R.id.empty_list_placeholder));
+        phraseList.setEmptyView(emptyView);
 //            phraseList.enableSwipeToDismiss(
 //                    new OnDismissCallback() {
 //                        @Override
@@ -59,23 +67,28 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
 //            );
         phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
         phraseList.setAdapter(phrasesCursorAdapter);
-        phraseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // CursorAdapter returns a cursor at the correct position for getItem(), or null
-                // if it cannot seek to that position.
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if (cursor != null) {
-                    Phrase phrase = DataUtil.fromCursor(cursor);
-                    callback.onPhraseSelected(phrase);
-                }
-            }
-        });
 
         // Needs to be after the phraseCursorAdapter creation
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         return rootView;
+    }
+
+    @OnItemClick(R.id.phrase_list)
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // CursorAdapter returns a cursor at the correct position for getItem(), or null
+        // if it cannot seek to that position.
+        Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+        if (cursor != null) {
+            Phrase phrase = DataUtil.fromCursor(cursor);
+            Log.d(LOG_TAG, "Clicked item for phrase: " + phrase);
+            callback.onPhraseSelected(phrase);
+        }
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
     }
 
     @Override

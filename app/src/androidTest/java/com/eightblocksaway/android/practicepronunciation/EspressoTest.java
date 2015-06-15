@@ -6,10 +6,8 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
-import com.eightblocksaway.android.practicepronunciation.view.ErrorFragments;
 import com.eightblocksaway.android.practicepronunciation.view.MainActivity;
 
-import org.apache.http.HttpEntity;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +25,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -50,8 +47,8 @@ public class EspressoTest {
     @Test
     public void testInitialState() {
         // test input fragment is empty
-        onView(withId(R.id.editText)).check(matches(withText("")));
-        onView(withId(R.id.editText)).check(matches(withHint(R.string.pronounce_hint)));
+        onView(withId(R.id.edit_text)).check(matches(withText("")));
+        onView(withId(R.id.edit_text)).check(matches(withHint(R.string.pronounce_hint)));
 
         // check buttons are disabled
         onView(withId(R.id.listen_button)).check(matches(not(isEnabled())));
@@ -65,7 +62,7 @@ public class EspressoTest {
 
     @Test
     public void testSearchNavigation() throws InterruptedException {
-        onView(withId(R.id.editText)).perform(typeText(PHRASE));
+        onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
 
         /**
          * Need to add this delay for the AsyncTask to commence :(
@@ -76,7 +73,7 @@ public class EspressoTest {
 
     @Test
     public void testSearchWordNotFound() throws InterruptedException {
-        onView(withId(R.id.editText)).perform(typeText("lololo"));
+        onView(withId(R.id.edit_text)).perform(typeText("lololo"));
 
         /**
          * Need to add this delay for the AsyncTask to commence :(
@@ -143,11 +140,11 @@ public class EspressoTest {
         testSearchNavigation();
 
         // Check that we are seeing the detail view
-        onView(withId(R.id.phraseText)).check(matches(isDisplayed()));
+        onView(withId(R.id.detail_phrase_text)).check(matches(isDisplayed()));
 
         pressBack();
 
-        onView(withId(R.id.phraseText)).check(doesNotExist());
+        onView(withId(R.id.detail_phrase_text)).check(doesNotExist());
         onView(withId(R.id.phrase_list_fragment)).check(matches(isDisplayed()));
     }
 
@@ -164,15 +161,15 @@ public class EspressoTest {
         onView(withId(R.id.add_button)).check(matches(isEnabled()));
 
         // check that the fragment is actually displayed
-        onView(withId(R.id.phraseText)).check(matches(isDisplayed()));
-        onView(withId(R.id.phraseText)).check(matches(withText(PHRASE)));
+        onView(withId(R.id.detail_phrase_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.detail_phrase_text)).check(matches(withText(PHRASE)));
 
         // check hyphenation
-        onView(withId(R.id.hyphenationList)).check(matches(hasDescendant(withText("hel"))));
-        onView(withId(R.id.hyphenationList)).check(matches(hasDescendant(withText("lo"))));
+        onView(withId(R.id.hyphenation_list)).check(matches(hasDescendant(withText("hel"))));
+        onView(withId(R.id.hyphenation_list)).check(matches(hasDescendant(withText("lo"))));
 
         // check definition
         String phraseDefinition = "Used to greet someone, answer the telephone, or express surprise.";
-        onView(withId(R.id.definitionList)).check(matches(hasDescendant(withText(containsString(phraseDefinition)))));
+        onView(withId(R.id.definition_list)).check(matches(hasDescendant(withText(containsString(phraseDefinition)))));
     }
 }

@@ -6,7 +6,7 @@
     android:padding="5dp">
 
     <TextView
-        android:id="@+id/definitionNumber"
+        android:id="@+id/definition_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingRight="10dp"

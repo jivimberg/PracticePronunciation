@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
@@ -19,14 +22,15 @@ import com.eightblocksaway.android.practicepronunciation.R;
  * create an instance of this fragment.
  */
 public class DetailErrorFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String IMG_SRC_ID = "img_src_id";
     private static final String TEXT_STRING_ID = "text_string_id";
 
-    // TODO: Rename and change types of parameters
     private Drawable errorIcon;
     private String errorText;
+
+    @InjectView(R.id.error_icon) ImageView icon;
+    @InjectView(R.id.error_text) TextView text;
 
 
     /**
@@ -35,7 +39,6 @@ public class DetailErrorFragment extends Fragment {
      *
      * @return A new instance of fragment DetailFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static DetailErrorFragment newInstance(int drawableId, int stringId) {
         DetailErrorFragment fragment = new DetailErrorFragment();
         Bundle args = new Bundle();
@@ -63,18 +66,21 @@ public class DetailErrorFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.detail_error_fragment, container, false);
+        ButterKnife.inject(this, rootView);
 
         if(errorIcon != null){
-            ImageView icon = (ImageView) rootView.findViewById(R.id.error_icon);
             icon.setImageDrawable(errorIcon);
         }
 
         if(errorText != null){
-            TextView text = (TextView) rootView.findViewById(R.id.error_text);
             text.setText(errorText);
         }
 
         return rootView;
     }
 
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
+    }
 }

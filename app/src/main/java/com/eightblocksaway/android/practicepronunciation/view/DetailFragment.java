@@ -26,11 +26,13 @@ import com.eightblocksaway.android.practicepronunciation.data.PronunciationContr
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
-import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
 import com.eightblocksaway.android.practicepronunciation.model.Stress;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
 
 import org.jetbrains.annotations.NotNull;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 
 /**
@@ -45,7 +47,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private Phrase phrase;
     private PhraseSelectCallback callback;
-    private View root;
+
+    @InjectView(R.id.detail_phrase_text) TextView phraseText;
+    @InjectView(R.id.hyphenation_list) LinearLayout hyphenation;
+    @InjectView(R.id.definition_list) LinearLayout definitionList;
+    @InjectView(R.id.detail_points_label) TextView detailPointsLabel;
+    @InjectView(R.id.detail_points_layout) LinearLayout detailPointsLayout;
+    @InjectView(R.id.detail_points_text) TextView detailPointsText;
+    @InjectView(R.id.detail_points_bar) ProgressBar detailPointsBar;
 
     /**
      * Use this factory method to create a new instance of
@@ -77,13 +86,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        root = inflater.inflate(R.layout.detail_fragment, container, false);
+        View root = inflater.inflate(R.layout.detail_fragment, container, false);
+        ButterKnife.inject(this, root);
 
         if(phrase != null){
+
             //set phrase
-            TextView textView = (TextView) root.findViewById(R.id.phraseText);
-            textView.setText(phrase.getPhrase());
-            textView.setOnClickListener(new View.OnClickListener() {
+            phraseText.setText(phrase.getPhrase());
+            phraseText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     callback.onPhraseSelected(phrase);
@@ -96,7 +106,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
 
             //set hyphenation
-            LinearLayout hyphenation = (LinearLayout) root.findViewById(R.id.hyphenationList);
             for (Syllable syllable : phrase.getHyphenation()) {
                 TextView syllableTV = new TextView(getActivity());
                 syllableTV.setText(syllable.getText());
@@ -122,15 +131,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
             //set definitions
-            LinearLayout definitionList = (LinearLayout) root.findViewById(R.id.definitionList);
             int definitionCount = 1;
             for (Definition definition : phrase.getDefinitions()) {
-                View definitionLayout = getLayoutInflater(null).inflate(R.layout.definition, null);
+                View definitionLayout = getLayoutInflater(null).inflate(R.layout.definition, definitionList, false);
 
-                TextView definitionNumber = (TextView) definitionLayout.findViewById(R.id.definitionNumber);
+                TextView definitionNumber = ButterKnife.findById(definitionLayout, R.id.definition_number);
                 definitionNumber.setText(Integer.toString(definitionCount++));
 
-                TextView definitionTV = (TextView) definitionLayout.findViewById(R.id.definition);
+                TextView definitionTV = ButterKnife.findById(definitionLayout, R.id.definition);
                 definitionTV.setText(Html.fromHtml("<i>" + definition.getPartOfSpeech() + ".</i> "
                         + "<font color=\"black\">" + definition.getDefinition() + "</font>"));
 
@@ -142,17 +150,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     }
 
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
+    }
+
     private void showPoints() {
-        TextView detailPointsLabel = (TextView) root.findViewById(R.id.detail_points_label);
         detailPointsLabel.setVisibility(View.VISIBLE);
-        LinearLayout detailPointsLayout = (LinearLayout) root.findViewById(R.id.detail_points_layout);
         detailPointsLayout.setVisibility(View.VISIBLE);
 
         int points = phrase.getPoints();
-        TextView detailPointsText = (TextView) root.findViewById(R.id.detail_points_text);
         detailPointsText.setText(points + "/" + getActivity().getResources().getInteger(R.integer.max_points));
 
-        ProgressBar detailPointsBar = (ProgressBar) root.findViewById(R.id.detail_points_bar);
         detailPointsBar.setProgress(points);
     }
 
