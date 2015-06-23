@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,8 +20,11 @@ import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.data.DataUtil;
 import com.eightblocksaway.android.practicepronunciation.data.PhrasesCursorAdapter;
 import com.eightblocksaway.android.practicepronunciation.data.PronunciationContract;
+import com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider;
+import com.eightblocksaway.android.practicepronunciation.data.SwipeToDeleteCursorWrapper;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -48,23 +52,23 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         ButterKnife.inject(this, rootView);
 
         phraseList.setEmptyView(emptyView);
-//            phraseList.enableSwipeToDismiss(
-//                    new OnDismissCallback() {
-//                        @Override
-//                        public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
-//                            final String phrase = getCurrentPhrase();
-//                            for (int position : reverseSortedPositions) {
-//                                Cursor cursor = (Cursor) phrasesCursorAdapter.getItem(position);
-//                                String removingPhrase = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_TEXT));
-//                                getActivity().getContentResolver().delete(PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{removingPhrase});
-//
-//                                if(phrase.equals(removingPhrase)){
-//                                    editText.setText("");
-//                                }
-//                            }
-//                        }
-//                    }
-//            );
+        phraseList.enableSwipeToDismiss(
+                new OnDismissCallback() {
+                    @Override
+                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+                        for (int position : reverseSortedPositions) {
+                            //To avoid flickering
+                            Cursor cursor = phrasesCursorAdapter.getCursor();
+                            SwipeToDeleteCursorWrapper cursorWrapper = new SwipeToDeleteCursorWrapper(cursor, position);
+                            phrasesCursorAdapter.swapCursor(cursorWrapper);
+
+                            cursor.moveToPosition(position);
+                            String removingPhrase = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_TEXT));
+                            getActivity().getContentResolver().delete(PronunciationContract.PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{removingPhrase});
+                        }
+                    }
+                }
+        );
         phrasesCursorAdapter = new PhrasesCursorAdapter(getActivity(), R.layout.phrase_list_item, null, 0);
         phraseList.setAdapter(phrasesCursorAdapter);
 

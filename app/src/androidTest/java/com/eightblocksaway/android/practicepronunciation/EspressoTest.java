@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -130,6 +131,17 @@ public class EspressoTest {
         onView(withText(containsString(PHRASE))).perform(click());
 
         onView(withId(R.id.remove_button)).perform(click());
+
+        // Check that we are in the list fragment and there is no item with PHRASE
+        onView(withId(R.id.phrase_list)).check(matches(not(hasDescendant(withText(containsString(PHRASE))))));
+    }
+
+    @Test
+    public void testSwipeToRemove() throws InterruptedException {
+        testAdd();
+
+        //noinspection unchecked
+        onView(withText(containsString(PHRASE))).perform(swipeRight());
 
         // Check that we are in the list fragment and there is no item with PHRASE
         onView(withId(R.id.phrase_list)).check(matches(not(hasDescendant(withText(containsString(PHRASE))))));
