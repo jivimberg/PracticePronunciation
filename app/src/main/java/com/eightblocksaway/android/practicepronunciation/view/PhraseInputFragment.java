@@ -223,13 +223,16 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     public void setPhrase(@NotNull Phrase phrase) {
         currentPhrase = phrase;
-        //set pronunciation
-        setPhraseText(phrase.getPhrase(), false);
-        pronunciationAlphabetLabel.setText(Html.fromHtml(phrase.getPronunciation()));
-        pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
+        if(isVisible()){
+            //set pronunciation
+            setPhraseText(phrase.getPhrase(), false);
+            pronunciationAlphabetLabel.setText(Html.fromHtml(phrase.getPronunciation()));
+            pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
 
-        //enable add button
-        addButton.setEnabled(true);
+            //enable add button
+            addButton.setEnabled(true);
+        }
+
     }
 
     private String getCurrentPhrase() {

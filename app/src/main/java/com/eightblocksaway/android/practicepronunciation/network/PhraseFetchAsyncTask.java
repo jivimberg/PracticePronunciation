@@ -46,6 +46,6 @@ public class PhraseFetchAsyncTask extends AsyncTask<String, Void, AsyncTaskResul
     }
 
     public interface Callback {
-        public void onPhraseFetch(AsyncTaskResult<Phrase> phrase);
+        void onPhraseFetch(AsyncTaskResult<Phrase> phrase);
     }
 }

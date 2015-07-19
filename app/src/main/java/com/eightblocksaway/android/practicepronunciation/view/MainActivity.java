@@ -72,6 +72,11 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onPhraseFetch(@NotNull AsyncTaskResult<Phrase> asyncTaskResult){
+        // if the activity has already been destroyed do nothing
+        if(getSupportFragmentManager().isDestroyed()){
+            return;
+        }
+
         if(asyncTaskResult.wasSuccessfull()) {
             Phrase phrase = asyncTaskResult.getResult();
             Log.i(LOG_TAG, "Receiving successful fetch for phrase: " + phrase);

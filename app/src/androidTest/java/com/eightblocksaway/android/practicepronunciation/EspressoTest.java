@@ -28,7 +28,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVi
 import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.internal.matchers.StringContains.containsString;
 
@@ -71,7 +70,7 @@ public class EspressoTest {
          * Need to add this delay for the AsyncTask to commence :(
          */
         Thread.sleep(1200);
-        checkDetailView();
+        checkDetailView(false);
     }
 
     @Test
@@ -82,7 +81,7 @@ public class EspressoTest {
          * Need to add this delay for the AsyncTask to commence :(
          */
         Thread.sleep(1200);
-        checkDetailView();
+        checkDetailView(false);
 
         onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
 
@@ -90,7 +89,22 @@ public class EspressoTest {
          * Need to add this delay for the AsyncTask to commence :(
          */
         Thread.sleep(1200);
-        checkDetailView();
+        checkDetailView(false);
+    }
+
+    /**
+     * Want to test that no ANR is thrown
+     */
+    @Test
+    public void testSearchWithoutWaiting() throws InterruptedException {
+        onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
+        onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
+
+        /**
+         * Need to add this delay for the AsyncTask to commence :(
+         */
+        Thread.sleep(1200);
+        checkDetailView(false);
     }
 
     @Test
@@ -134,6 +148,25 @@ public class EspressoTest {
     }
 
 
+    /**
+     * Want to test that no ANR is thrown
+     */
+    @Test
+    public void testAddSearchAndRotateWithoutWaiting() throws InterruptedException {
+        testSearchNavigation();
+
+        onView(withId(R.id.add_button)).perform(click());
+
+        onView(withId(R.id.clear_edit_text)).perform(click());
+
+        // search for the same phrase again
+        onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
+
+        onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
+        checkDetailView(true);
+    }
+
+
     @Test
     public void testClickItem() throws InterruptedException {
         testAdd();
@@ -141,7 +174,7 @@ public class EspressoTest {
         //noinspection unchecked
         onView(withText(containsString(PHRASE))).perform(click());
 
-        checkDetailView();
+        checkDetailView(true);
     }
 
     @Test
@@ -181,7 +214,7 @@ public class EspressoTest {
         onView(withId(R.id.phrase_list_fragment)).check(matches(isDisplayed()));
     }
 
-    private void checkDetailView() {
+    private void checkDetailView(boolean phraseAdded) {
         // check buttons become enabled
         onView(withId(R.id.listen_button)).check(matches(isEnabled()));
 
@@ -191,7 +224,13 @@ public class EspressoTest {
         //onView(withId(R.id.speak_button)).check(matches(isEnabled()));
 
         // check add button
-        onView(withId(R.id.add_button)).check(matches(isEnabled()));
+        if(phraseAdded){
+            onView(withId(R.id.remove_button)).check(matches(isEnabled()));
+            onView(withId(R.id.add_button)).check(matches(not(isDisplayed())));
+        } else {
+            onView(withId(R.id.add_button)).check(matches(isEnabled()));
+            onView(withId(R.id.remove_button)).check(matches(not(isDisplayed())));
+        }
 
         // check that the fragment is actually displayed
         onView(withId(R.id.detail_phrase_text)).check(matches(isDisplayed()));
