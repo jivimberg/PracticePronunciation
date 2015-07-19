@@ -90,6 +90,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:src="@drawable/play_button_selector"
+            android:id="@+id/play_button"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/play"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:src="@drawable/add_button_selector"
             android:id="@+id/add_button"
             android:background="?attr/selectableItemBackgroundBorderless"

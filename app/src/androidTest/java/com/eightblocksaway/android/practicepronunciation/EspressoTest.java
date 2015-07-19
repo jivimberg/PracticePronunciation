@@ -23,6 +23,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -54,6 +55,7 @@ public class EspressoTest {
         // check buttons are disabled
         onView(withId(R.id.listen_button)).check(matches(not(isEnabled())));
         onView(withId(R.id.speak_button)).check(matches(not(isEnabled())));
+        onView(withId(R.id.play_button)).check(matches(not(isEnabled())));
         onView(withId(R.id.add_button)).check(matches(not(isEnabled())));
         onView(withId(R.id.remove_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
 
@@ -64,6 +66,25 @@ public class EspressoTest {
     @Test
     public void testSearchNavigation() throws InterruptedException {
         onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
+
+        /**
+         * Need to add this delay for the AsyncTask to commence :(
+         */
+        Thread.sleep(1200);
+        checkDetailView();
+    }
+
+    @Test
+    public void testSearchAndRotate() throws InterruptedException {
+        onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
+
+        /**
+         * Need to add this delay for the AsyncTask to commence :(
+         */
+        Thread.sleep(1200);
+        checkDetailView();
+
+        onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
 
         /**
          * Need to add this delay for the AsyncTask to commence :(

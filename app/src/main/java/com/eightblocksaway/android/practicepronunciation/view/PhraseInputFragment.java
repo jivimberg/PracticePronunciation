@@ -3,6 +3,7 @@ package com.eightblocksaway.android.practicepronunciation.view;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -25,6 +28,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -45,6 +49,9 @@ import com.eightblocksaway.android.practicepronunciation.network.PhraseFetchAsyn
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +74,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     @InjectView(R.id.listen_button) ImageButton listenButton;
     @InjectView(R.id.speak_button) ImageButton speakButton;
+    @InjectView(R.id.play_button) ImageButton playButton;
     @InjectView(R.id.add_button) ImageButton addButton;
     @InjectView(R.id.remove_button) ImageButton removeButton;
     @InjectView(R.id.clear_edit_text) ImageButton clearEditText;
@@ -83,6 +91,8 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private Callback callback;
 
     public static final long DELAY = 1000;
+    private MediaPlayer mp;
+    private boolean mpPrepared = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,6 +104,15 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
         listenButton.setEnabled(false);
         speakButton.setEnabled(false);
+        playButton.setEnabled(false);
+        playButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.setPressed(true);
+                v.performClick();
+                return true;
+            }
+        });
         addButton.setEnabled(false);
 
         enableTTS();
@@ -103,19 +122,19 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     }
 
     @OnClick(R.id.clear_edit_text)
-    void clearText(View v) {
+    void clearText() {
         editText.setText("");
     }
 
     @OnClick(R.id.remove_button)
-    public void removePhrase(View v) {
+    public void removePhrase() {
         final String phrase = getCurrentPhrase();
         getActivity().getContentResolver().delete(PronunciationContract.PhraseEntry.CONTENT_URI, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
         editText.setText("");
     }
 
     @OnClick(R.id.add_button)
-    void addCurrentPhrase(View v) {
+    void addCurrentPhrase() {
         if(currentPhrase != null){
             ContentValues phraseValues = DataUtil.toContentValues(currentPhrase);
             getActivity().getContentResolver().insert(PronunciationContract.PhraseEntry.CONTENT_URI, phraseValues);
@@ -221,9 +240,14 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.reset(this);
+
         if(mTts != null){
             Log.d(LOG_TAG, "Shutting down TTS Engine");
             mTts.shutdown();
+        }
+
+        if(mp != null){
+            mp.release();
         }
     }
 
@@ -242,6 +266,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         speakButton.setEnabled(false);
         addButton.setEnabled(false);
         clearEditText.setEnabled(false);
+        disablePlayRecording();
         clearEditText.setVisibility(View.INVISIBLE);
     }
 
@@ -260,6 +285,9 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                     intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say \"" + getCurrentPhrase() + "\"" );
+                    // secret parameters that when added provide audio url in the result
+                    intent.putExtra("android.speech.extra.GET_AUDIO_FORMAT", "audio/AMR");
+                    intent.putExtra("android.speech.extra.GET_AUDIO", true);
                     startActivityForResult(intent, SPEECH_RECOGNITION_CODE);
                 }
             });
@@ -347,6 +375,10 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             PronunciationRecognitionResult result = PronunciationRecognitionResult.evaluate(phrase, matches);
             Log.i(PronunciationRecognitionResult.LOG_TAG, "Pronunciation recognition result: " + result);
 
+            // Enable play recording
+            Uri audioUri = data.getData();
+            enablePlayRecording(audioUri);
+
             //TODO this should be done in the background
             ContentValues values = new ContentValues();
             values.put(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL, result.getScore());
@@ -385,6 +417,48 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             toast.show();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void enablePlayRecording(@NotNull Uri audioUri) {
+        final FragmentActivity ctx = getActivity();
+        try {
+            mp = new MediaPlayer();
+            mpPrepared = false;
+            mp.setDataSource(ctx, audioUri);
+            mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer arg0) {
+                    mpPrepared = true;
+                }
+            });
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    playButton.setPressed(false);
+                }
+            });
+            mp.prepareAsync();
+            playButton.setEnabled(true);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Could not load audio uri", e);
+        }
+    }
+
+    private void disablePlayRecording() {
+        if(mp != null){
+            mp.release();
+            mp = null;
+            mpPrepared = false;
+        }
+    }
+
+    @OnClick(R.id.play_button)
+    public void playRecording(ImageButton button){
+        //TODO handle click while it's playing
+        if(mp != null && mpPrepared) {
+            playButton.setPressed(true);
+            mp.start();
+        }
     }
 
     /**
