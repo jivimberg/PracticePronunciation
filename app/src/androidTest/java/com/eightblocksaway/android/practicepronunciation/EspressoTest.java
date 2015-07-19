@@ -123,6 +123,15 @@ public class EspressoTest {
     }
 
     @Test
+    public void testClear() throws InterruptedException {
+        testSearchNavigation();
+
+        onView(withId(R.id.clear_edit_text)).perform(click());
+
+        testInitialState();
+    }
+
+    @Test
     public void testAdd() throws InterruptedException {
         testSearchNavigation();
 
