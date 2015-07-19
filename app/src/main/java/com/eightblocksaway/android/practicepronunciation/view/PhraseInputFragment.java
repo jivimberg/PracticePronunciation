@@ -3,7 +3,6 @@ package com.eightblocksaway.android.practicepronunciation.view;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -49,9 +47,7 @@ import com.eightblocksaway.android.practicepronunciation.network.PhraseFetchAsyn
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -70,6 +66,10 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     private static final int TTS_CHECK_CODE = 1;
     private static final int SPEECH_RECOGNITION_CODE = 2;
     private static final String LOG_TAG = "PhraseInputFragment";
+    private static final String RECORDING_URI = "RECORDING_URI";
+    private static final String PREVIOUS_INPUT = "PREVIOUS_INPUT";
+    private static final String PRONUNCIATION_LABEL_VALUE = "PRONUNCIATION_LABEL_VALUE";
+    private static final String PHRASE_IS_SAVED = "PHRASE_IS_SAVED";
     private TextToSpeech mTts;
 
     @InjectView(R.id.listen_button) ImageButton listenButton;
@@ -81,7 +81,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     @InjectView(R.id.edit_text) EditText editText;
     @InjectView(R.id.pronunciation_alphabet_label) TextView pronunciationAlphabetLabel;
 
-    private String previousInput = "";
+    @NotNull private String previousInput = "";
     private boolean speechRecognitionInitialized = false;
 
     private boolean ttsInitialized = false;
@@ -93,6 +93,34 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     public static final long DELAY = 1000;
     private MediaPlayer mp;
     private boolean mpPrepared = false;
+    private Uri recordingUri;
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            String previousInput = savedInstanceState.getString(PREVIOUS_INPUT);
+            if(previousInput != null){
+                this.previousInput = previousInput;
+                if(!previousInput.equals("")){
+                    String pronunciation = savedInstanceState.getString(PRONUNCIATION_LABEL_VALUE);
+                    pronunciationAlphabetLabel.setText(pronunciation);
+                    pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
+
+                    boolean isPersisted = savedInstanceState.getBoolean(PHRASE_IS_SAVED);
+                    setPersistedButtonState(isPersisted);
+
+                    enableButtons();
+                }
+            }
+
+            String uriString = savedInstanceState.getString(RECORDING_URI);
+            if(uriString != null){
+                recordingUri = Uri.parse(uriString);
+                enablePlayRecording(recordingUri);
+            }
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,6 +147,18 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         enableSpeechRecognition();
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(PREVIOUS_INPUT, previousInput);
+        outState.putString(PRONUNCIATION_LABEL_VALUE, pronunciationAlphabetLabel.getText().toString());
+        outState.putBoolean(PHRASE_IS_SAVED, removeButton.getVisibility() == View.VISIBLE);
+
+        if(recordingUri != null){
+            outState.putString(RECORDING_URI, recordingUri.toString());
+        }
     }
 
     @OnClick(R.id.clear_edit_text)
@@ -149,8 +189,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
             //change + button to -
-            addButton.setVisibility(View.GONE);
-            removeButton.setVisibility(View.VISIBLE);
+            setPersistedButtonState(true);
         } else {
             Log.e(LOG_TAG, "Illegal state. Current phrase is null");
         }
@@ -167,8 +206,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             pronunciationAlphabetLabel.setText("");
             currentPhrase = null;
             //change remove button back to +
-            removeButton.setVisibility(View.GONE);
-            addButton.setVisibility(View.VISIBLE);
+            setPersistedButtonState(false);
             dissableButtons();
 
             if(currentInput.length() == 0){
@@ -190,8 +228,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
                         Phrase phraseFromDB = DataUtil.fromCursor(cursor);
 
                         //change add button for remove button
-                        addButton.setVisibility(View.GONE);
-                        removeButton.setVisibility(View.VISIBLE);
+                        setPersistedButtonState(true);
 
                         //Cancel delayed lookups
                         if(!ignoreEvents) {
@@ -254,6 +291,19 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         }
     }
 
+    private void setPersistedButtonState(boolean isPersisted) {
+        if(isPersisted){
+            addButton.setEnabled(false);
+            addButton.setVisibility(View.GONE);
+            removeButton.setEnabled(true);
+            removeButton.setVisibility(View.VISIBLE);
+        } else {
+            addButton.setEnabled(true);
+            addButton.setVisibility(View.VISIBLE);
+            removeButton.setEnabled(false);
+            removeButton.setVisibility(View.GONE);
+        }
+    }
 
     private void enableButtons() {
         if(ttsInitialized)
@@ -424,6 +474,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     private void enablePlayRecording(@NotNull Uri audioUri) {
         final FragmentActivity ctx = getActivity();
+        recordingUri = audioUri;
         try {
             mp = new MediaPlayer();
             mpPrepared = false;
@@ -448,11 +499,12 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
     }
 
     private void disablePlayRecording() {
+        playButton.setEnabled(false);
         if(mp != null){
-            playButton.setEnabled(false);
             mp.release();
             mp = null;
             mpPrepared = false;
+            recordingUri = null;
         }
     }
 

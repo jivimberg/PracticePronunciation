@@ -96,15 +96,12 @@ public class EspressoTest {
      * Want to test that no ANR is thrown
      */
     @Test
-    public void testSearchWithoutWaiting() throws InterruptedException {
+    public void testSearchRotateWithoutWaiting() throws InterruptedException {
         onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
         onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
 
-        /**
-         * Need to add this delay for the AsyncTask to commence :(
-         */
-        Thread.sleep(1200);
-        checkDetailView(false);
+        // detail view will be empty because we are not giving it time to load
+        onView(withId(R.id.phrase_list_fragment)).check(matches(isDisplayed()));
     }
 
     @Test

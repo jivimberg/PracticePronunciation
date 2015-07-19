@@ -30,7 +30,13 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().findFragmentById(R.id.phrase_input_fragment);
+
+        if(savedInstanceState != null){
+            phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().getFragment(
+                    savedInstanceState, "PhraseInputFragment");
+        } else {
+            phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().findFragmentById(R.id.phrase_input_fragment);
+        }
 
         if(findViewById(R.id.multi_fragment_container) != null){
             //phone
@@ -47,6 +53,13 @@ public class MainActivity extends ActionBarActivity
             isPhone = false;
             detailFragmentContainerId = R.id.detail_fragment_container;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, "PhraseInputFragment", phraseInputFragment);
     }
 
     @Override
@@ -132,7 +145,7 @@ public class MainActivity extends ActionBarActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(detailFragmentContainerId, detailFragment)
                 .addToBackStack(null)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     @Override
