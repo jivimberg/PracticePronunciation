@@ -449,6 +449,7 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
 
     private void disablePlayRecording() {
         if(mp != null){
+            playButton.setEnabled(false);
             mp.release();
             mp = null;
             mpPrepared = false;
