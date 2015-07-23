@@ -1,13 +1,10 @@
 package com.eightblocksaway.android.practicepronunciation.network;
 
 import android.os.AsyncTask;
-import android.view.View;
-import android.widget.TextView;
 
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
-import com.eightblocksaway.android.practicepronunciation.view.PhraseListFragment;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;

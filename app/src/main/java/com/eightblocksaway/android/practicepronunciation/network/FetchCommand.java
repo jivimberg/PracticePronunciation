@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class FetchCommand<T> {
     private static final String LOG_TAG = "FetchCommand";
@@ -20,10 +22,16 @@ public abstract class FetchCommand<T> {
     protected static final String API_KEY = "f4e175385742da274a23a0f99b20c521488ff167472c614f5";
     private final Uri uri;
     private final String phrase;
+    private Map<String, String> headers;
 
-    public FetchCommand(Uri uri, String phrase){
+    public FetchCommand(@NotNull Uri uri, @NotNull String phrase){
+        this(uri, phrase, new HashMap<String, String>());
+    }
+
+    public FetchCommand(@NotNull Uri uri, @NotNull String phrase, @NotNull Map<String, String> headers){
         this.uri = uri;
         this.phrase = phrase;
+        this.headers = headers;
     }
 
     public T fetchData() throws IOException, JSONException, EmptyResponseException {
@@ -37,6 +45,11 @@ public abstract class FetchCommand<T> {
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                if(header.getValue() != null){
+                    urlConnection.setRequestProperty(header.getKey(), header.getValue());
+                }
+            }
             urlConnection.connect();
 
             // Read the input stream into a String
