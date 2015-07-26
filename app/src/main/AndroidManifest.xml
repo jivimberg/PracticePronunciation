@@ -26,6 +26,14 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".view.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.eightblocksaway.android.practicepronunciation.view.MainActivity" />
+        </activity>
 
         <provider
             android:authorities="@string/content_authority"

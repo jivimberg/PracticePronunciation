@@ -24,5 +24,12 @@
     <string name="phrase_saved_toast">Word added to your list</string>
     <string name="TTS_no_available">No Text To Speech engine on device</string>
     <string name="points">POINTS</string>
+    <string name="pronunciation_preference_title">Pronunciation dictionary</string>
+    <string name="pronunciation_dictionary_key">pronunciation_dictionary_key</string>
+    <string name="ahd">American Heritage Dictionary</string>
+    <string name="ipa">International Phonetic Alphabet</string>
+    <string name="ahd_key">ahd-legacy</string>
+    <string name="ipa_key">ipa</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>

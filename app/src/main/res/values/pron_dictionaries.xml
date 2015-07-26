@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unit_entries">
+        <item>@string/ahd</item>
+        <item>@string/ipa</item>
+    </string-array>
+
+    <string-array name="unit_values">
+        <item>@string/ahd_key</item>
+        <item>@string/ipa_key</item>
+    </string-array>
+</resources>
