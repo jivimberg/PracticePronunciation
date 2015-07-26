@@ -1,13 +1,10 @@
 package com.eightblocksaway.android.practicepronunciation.network;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 
 import com.eightblocksaway.android.practicepronunciation.model.Definition;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
 import com.eightblocksaway.android.practicepronunciation.model.Syllable;
-import com.eightblocksaway.android.practicepronunciation.view.SettingsActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -28,13 +25,13 @@ public class PhraseFetchAsyncTask extends AsyncTask<String, Void, AsyncTaskResul
     protected AsyncTaskResult<Phrase> doInBackground(String... params) {
         String phrase = params[0];
         try {
-            String pronunciation = FetchPronunciation.create(phrase).fetchData();
+            String ahdPronunciation = FetchPronunciation.create(phrase).fetchData();
+            String ipaPronunciation = FetchMacmillanPronunciation.create(phrase).fetchData();
             List<Definition> definitions = FetchDefinitions.create(phrase).fetchData();
             List<Syllable> hyphenation = FetchHyphenation.create(phrase).fetchData();
 
-//            FetchMacmillanPronunciation.create(phrase).fetchData();
 
-            return new AsyncTaskResult<>(Phrase.createNotPersisted(phrase, pronunciation, definitions, hyphenation));
+            return new AsyncTaskResult<>(Phrase.createNotPersisted(phrase, ahdPronunciation, ipaPronunciation, definitions, hyphenation));
         } catch (IOException | JSONException | FetchCommand.EmptyResponseException e) {
             return new AsyncTaskResult<>(e);
         }

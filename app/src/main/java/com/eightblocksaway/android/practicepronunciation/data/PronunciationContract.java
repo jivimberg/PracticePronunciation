@@ -54,6 +54,7 @@ public class PronunciationContract {
         public static final String COLUMN_DEFINITIONS = "definition";
         public static final String COLUMN_MASTERY_LEVEL = "masteryLevel";
         public static final String COLUMN_PRONUNCIATION = "pronunciation";
+        public static final String COLUMN_IPA_PRONUNCIATION = "ipa_pronunciation";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_PHRASE).build();

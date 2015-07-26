@@ -41,7 +41,8 @@ public class DataUtil {
         ContentValues result = new ContentValues();
         result.put(PhraseEntry.COLUMN_TEXT, phrase.getPhrase());
         result.put(PhraseEntry.COLUMN_MASTERY_LEVEL, 0);
-        result.put(PhraseEntry.COLUMN_PRONUNCIATION, phrase.getPronunciation());
+        result.put(PhraseEntry.COLUMN_PRONUNCIATION, phrase.getAhdPronunciation());
+        result.put(PhraseEntry.COLUMN_IPA_PRONUNCIATION, phrase.getIpaPronunciation());
         result.put(PhraseEntry.COLUMN_DEFINITIONS, encodeDefinitions(phrase.getDefinitions()));
         result.put(PhraseEntry.COLUMN_HYPHENATION, encodeHyphenation(phrase.getHyphenation()));
         return result;
@@ -87,13 +88,14 @@ public class DataUtil {
 
     public static Phrase fromCursor(@NotNull Cursor cursor) {
         String phrase = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_TEXT));
-        String pronunciation = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_PRONUNCIATION));
+        String ahdPronunciation = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_PRONUNCIATION));
+        String ipaPronunciation = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_IPA_PRONUNCIATION));
         String definitionsString = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_DEFINITIONS));
         List<Definition> definitions = decodeDefinitions(definitionsString);
         String hyphenationString = cursor.getString(cursor.getColumnIndex(PhraseEntry.COLUMN_HYPHENATION));
         List<Syllable> hyphenation = decodeHyphenation(hyphenationString);
         int points = cursor.getInt(cursor.getColumnIndex(PhraseEntry.COLUMN_MASTERY_LEVEL));
-        return Phrase.createPersisted(phrase, pronunciation, definitions, hyphenation, points);
+        return Phrase.createPersisted(phrase, ahdPronunciation, ipaPronunciation, definitions, hyphenation, points);
     }
 
     private static List<Definition> decodeDefinitions(@NotNull String definitionsString) {

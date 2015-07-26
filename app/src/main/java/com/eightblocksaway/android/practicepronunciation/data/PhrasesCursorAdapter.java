@@ -1,12 +1,15 @@
 package com.eightblocksaway.android.practicepronunciation.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.ResourceCursorAdapter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.model.PronunciationRecognitionResult;
@@ -35,7 +38,17 @@ public class PhrasesCursorAdapter extends ResourceCursorAdapter {
         String text = cursor.getString(columnTextIndex);
         phraseText.setText(text);
 
-        String pronunciation = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION));
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String pronunciationDict = sharedPref.getString(context.getString(R.string.pronunciation_dictionary_key), context.getString(R.string.ahd_key));
+        String pronunciation = "";
+        if(pronunciationDict.equals(context.getString(R.string.ipa_key))){
+            pronunciation = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_IPA_PRONUNCIATION));
+        }
+
+        if(TextUtils.isEmpty(pronunciation)) {
+            pronunciation = cursor.getString(cursor.getColumnIndex(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION));
+        }
+
         phrasePronunciation.setText("");
         if(!TextUtils.isEmpty(pronunciation)){
             phrasePronunciation.setText(pronunciation);

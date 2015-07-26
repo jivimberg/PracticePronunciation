@@ -28,7 +28,7 @@ import static com.eightblocksaway.android.practicepronunciation.data.Pronunciati
 public class PronunciationDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "pronunciation.db";
 
@@ -52,6 +52,7 @@ public class PronunciationDbHelper extends SQLiteOpenHelper {
                 PhraseEntry.COLUMN_DEFINITIONS + " TEXT, " +
                 PhraseEntry.COLUMN_HYPHENATION + " TEXT, " +
                 PhraseEntry.COLUMN_MASTERY_LEVEL + " INTEGER NOT NULL, " +
+                PhraseEntry.COLUMN_IPA_PRONUNCIATION + " TEXT, " +
 
                 // To assure the application have just one weather entry per day
                 // per location, it's created a UNIQUE constraint with REPLACE strategy
@@ -75,6 +76,17 @@ public class PronunciationDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        //do nothing
+        int upgradeTo = oldVersion + 1;
+        while (upgradeTo <= newVersion)
+        {
+            switch (upgradeTo)
+            {
+                case 3:
+                    sqLiteDatabase.execSQL("ALTER TABLE " + PhraseEntry.TABLE_NAME + " ADD COLUMN "
+                            +  PhraseEntry.COLUMN_IPA_PRONUNCIATION + " TEXT;");
+                    break;
+            }
+            upgradeTo++;
+        }
     }
 }

@@ -57,7 +57,7 @@ public class FetchMacmillanPronunciation extends FetchCommand<String>{
             XPathExpression expression = xpath.compile("//PRON/text()");
             InputSource is = new InputSource(new StringReader(xml));
             String result = (String) expression.evaluate(is, XPathConstants.STRING);
-            Log.i(LOG_TAG, "Returning pronunciation " + result);
+            Log.i(LOG_TAG, "Returning IPA pronunciation " + result);
             return result;
         } catch (XPathExpressionException e) {
             throw new JSONException(e.getMessage());

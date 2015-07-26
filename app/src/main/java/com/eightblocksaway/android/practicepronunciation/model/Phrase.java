@@ -2,9 +2,9 @@ package com.eightblocksaway.android.practicepronunciation.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,43 +14,48 @@ public final class Phrase implements Parcelable{
     private final String phrase;
     private final List<Definition> definitions;
     private final List<Syllable> hyphenation;
-    private final String pronunciation;
+    private final String ahdPronunciation;
+    private String ipaPronunciation;
     private boolean persisted;
     private int points;
 
     private Phrase(@NotNull String phrase,
-                   @NotNull String pronunciation,
+                   @NotNull String ahdPronunciation,
                    @NotNull List<Definition> definitions,
                    @NotNull List<Syllable> hyphenation,
+                   @NotNull String ipaPronunciation,
                    boolean persisted,
                    int points) {
         this.phrase = phrase;
-        this.pronunciation = pronunciation;
+        this.ahdPronunciation = ahdPronunciation;
         this.definitions = definitions;
         this.hyphenation = hyphenation;
+        this.ipaPronunciation = ipaPronunciation;
         this.points = points;
         this.persisted = persisted;
         this.points = points;
     }
 
     public static Phrase createPersisted(@NotNull String phrase,
-                                         @NotNull String pronunciation,
+                                         @NotNull String ahdPronunciation,
+                                         @NotNull String ipaPronunciation,
                                          @NotNull List<Definition> definitions,
                                          @NotNull List<Syllable> hyphenation,
                                          int points) {
-        return new Phrase(phrase, pronunciation, definitions, hyphenation, true, points);
+        return new Phrase(phrase, ahdPronunciation, definitions, hyphenation, ipaPronunciation, true, points);
     }
 
     public static Phrase createNotPersisted(@NotNull String phrase,
-                                         @NotNull String pronunciation,
+                                         @NotNull String ahdPronunciation,
+                                         @NotNull String ipaPronunciation,
                                          @NotNull List<Definition> definitions,
                                          @NotNull List<Syllable> hyphenation) {
-        return new Phrase(phrase, pronunciation, definitions, hyphenation, false, 0);
+        return new Phrase(phrase, ahdPronunciation, definitions, hyphenation, ipaPronunciation, false, 0);
     }
 
     public static Phrase toPersisted(@NotNull Phrase currentPhrase) {
-        return createPersisted(currentPhrase.getPhrase(), currentPhrase.getPronunciation(),
-                currentPhrase.getDefinitions(), currentPhrase.getHyphenation(), 0);
+        return createPersisted(currentPhrase.getPhrase(), currentPhrase.getAhdPronunciation(),
+                currentPhrase.getIpaPronunciation(), currentPhrase.getDefinitions(), currentPhrase.getHyphenation(), 0);
     }
 
     @NotNull
@@ -69,8 +74,12 @@ public final class Phrase implements Parcelable{
     }
 
     @NotNull
-    public String getPronunciation() {
-        return pronunciation;
+    public String getAhdPronunciation() {
+        return ahdPronunciation;
+    }
+
+    @NotNull public String getIpaPronunciation() {
+        return ipaPronunciation;
     }
 
     public boolean isPersisted() {
@@ -105,7 +114,8 @@ public final class Phrase implements Parcelable{
                 "phrase='" + phrase + '\'' +
                 ", definitions=" + definitions +
                 ", hyphenation=" + hyphenation +
-                ", pronunciation='" + pronunciation + '\'' +
+                ", ahdPronunciation='" + ahdPronunciation + '\'' +
+                ", ipaPronunciation='" + ipaPronunciation + '\'' +
                 ", persisted=" + persisted +
                 ", points=" + points +
                 '}';
@@ -114,18 +124,19 @@ public final class Phrase implements Parcelable{
     protected Phrase(Parcel in) {
         phrase = in.readString();
         if (in.readByte() == 0x01) {
-            definitions = new ArrayList<Definition>();
+            definitions = new ArrayList<>();
             in.readList(definitions, Definition.class.getClassLoader());
         } else {
             definitions = null;
         }
         if (in.readByte() == 0x01) {
-            hyphenation = new ArrayList<Syllable>();
+            hyphenation = new ArrayList<>();
             in.readList(hyphenation, Syllable.class.getClassLoader());
         } else {
             hyphenation = null;
         }
-        pronunciation = in.readString();
+        ahdPronunciation = in.readString();
+        ipaPronunciation = in.readString();
         persisted = in.readByte() != 0x00;
         points = in.readInt();
     }
@@ -150,7 +161,8 @@ public final class Phrase implements Parcelable{
             dest.writeByte((byte) (0x01));
             dest.writeList(hyphenation);
         }
-        dest.writeString(pronunciation);
+        dest.writeString(ahdPronunciation);
+        dest.writeString(ipaPronunciation);
         dest.writeByte((byte) (persisted ? 0x01 : 0x00));
         dest.writeInt(points);
     }

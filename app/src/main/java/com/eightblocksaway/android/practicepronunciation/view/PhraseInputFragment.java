@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
@@ -14,6 +15,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -263,7 +265,20 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
         if(isVisible()){
             //set pronunciation
             setPhraseText(phrase.getPhrase(), false);
-            pronunciationAlphabetLabel.setText(Html.fromHtml(phrase.getPronunciation()));
+
+            FragmentActivity ctx = getActivity();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+            String pronunciationDict = sharedPref.getString(ctx.getString(R.string.pronunciation_dictionary_key), ctx.getString(R.string.ahd_key));
+            String pronunciation = "";
+            if(pronunciationDict.equals(ctx.getString(R.string.ipa_key))){
+                pronunciation = phrase.getIpaPronunciation();
+            }
+
+            if(TextUtils.isEmpty(pronunciation)) {
+                pronunciation = phrase.getAhdPronunciation();
+            }
+
+            pronunciationAlphabetLabel.setText(Html.fromHtml(pronunciation));
             pronunciationAlphabetLabel.setVisibility(View.VISIBLE);
 
             //enable add button
@@ -435,10 +450,6 @@ public class PhraseInputFragment extends Fragment implements TextToSpeech.OnInit
             //TODO this should be done in the background
             ContentValues values = new ContentValues();
             values.put(PronunciationContract.PhraseEntry.COLUMN_MASTERY_LEVEL, result.getScore());
-            String pronunciation = pronunciationAlphabetLabel.getText().toString().trim();
-            if(!TextUtils.isEmpty(pronunciation)){
-                values.put(PronunciationContract.PhraseEntry.COLUMN_PRONUNCIATION, pronunciation);
-            }
             ctx.getContentResolver().update(PronunciationContract.PhraseEntry.CONTENT_URI,
                     values, PronunciationProvider.phraseByTextSelector, new String[]{phrase});
 

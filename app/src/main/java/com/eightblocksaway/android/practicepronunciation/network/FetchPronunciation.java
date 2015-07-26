@@ -37,7 +37,7 @@ public class FetchPronunciation extends FetchCommand<String>{
 
         JSONObject jsonObject = (JSONObject) root.get(0);
         String result = jsonObject.getString("raw");
-        Log.i(LOG_TAG, "Returning pronunciation " + result);
+        Log.i(LOG_TAG, "Returning AHD pronunciation " + result);
         return result;
     }
 }

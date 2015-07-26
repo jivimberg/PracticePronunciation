@@ -87,12 +87,6 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         setPreferenceSummary(preference, value);
-
-        //TODO test zone
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String pronunciationDict = sharedPref.getString(getString(R.string.pronunciation_dictionary_key), getString(R.string.ahd_key));
-        Toast.makeText(this, pronunciationDict, Toast.LENGTH_SHORT).show();
-
         return true;
     }
 
