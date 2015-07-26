@@ -29,8 +29,12 @@ public class FetchPronunciation extends FetchCommand<String>{
     }
 
     @Override
-    protected String doParseResult(String json) throws JSONException {
+    protected String parseResult(String json) throws JSONException, EmptyResponseException {
         JSONArray root = new JSONArray(json);
+        if(root.length() <= 0){
+            throw new EmptyResponseException();
+        }
+
         JSONObject jsonObject = (JSONObject) root.get(0);
         String result = jsonObject.getString("raw");
         Log.i(LOG_TAG, "Returning pronunciation " + result);

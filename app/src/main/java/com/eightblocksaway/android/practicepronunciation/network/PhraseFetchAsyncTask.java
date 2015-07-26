@@ -29,6 +29,8 @@ public class PhraseFetchAsyncTask extends AsyncTask<String, Void, AsyncTaskResul
             List<Definition> definitions = FetchDefinitions.create(phrase).fetchData();
             List<Syllable> hyphenation = FetchHyphenation.create(phrase).fetchData();
 
+//            FetchMacmillanPronunciation.create(phrase).fetchData();
+
             return new AsyncTaskResult<>(Phrase.createNotPersisted(phrase, pronunciation, definitions, hyphenation));
         } catch (IOException | JSONException | FetchCommand.EmptyResponseException e) {
             return new AsyncTaskResult<>(e);

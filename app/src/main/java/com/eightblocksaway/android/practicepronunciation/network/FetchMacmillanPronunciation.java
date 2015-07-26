@@ -6,10 +6,22 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 public class FetchMacmillanPronunciation extends FetchCommand<String>{
 
@@ -33,10 +45,22 @@ public class FetchMacmillanPronunciation extends FetchCommand<String>{
     }
 
     @Override
-    protected String doParseResult(String json) throws JSONException {
-        //TODO check about overriding parseResult altogether because we are receiving jsonObject instead of jsonArray
-        String result = json;
-        Log.i(LOG_TAG, "Returning pronunciation " + result);
-        return result;
+    protected String parseResult(String json) throws JSONException, EmptyResponseException {
+        JSONObject root = new JSONObject(json);
+        if(root.length() <= 0){
+            throw new EmptyResponseException();
+        }
+
+        try {
+            String xml = root.getString("entryContent");
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            XPathExpression expression = xpath.compile("//PRON/text()");
+            InputSource is = new InputSource(new StringReader(xml));
+            String result = (String) expression.evaluate(is, XPathConstants.STRING);
+            Log.i(LOG_TAG, "Returning pronunciation " + result);
+            return result;
+        } catch (XPathExpressionException e) {
+            throw new JSONException(e.getMessage());
+        }
     }
 }

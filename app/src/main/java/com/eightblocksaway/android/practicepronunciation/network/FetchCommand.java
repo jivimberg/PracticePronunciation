@@ -91,16 +91,7 @@ public abstract class FetchCommand<T> {
         }
     }
 
-    private T parseResult(@NotNull String json) throws JSONException, EmptyResponseException {
-        JSONArray root = new JSONArray(json);
-        if(root.length() <= 0){
-            throw new EmptyResponseException();
-        } else {
-            return doParseResult(json);
-        }
-    }
-
-    protected abstract T doParseResult(String json) throws JSONException;
+    protected abstract T parseResult(String json) throws JSONException, EmptyResponseException;
 
     public static class EmptyResponseException extends Exception {}
 }

@@ -34,9 +34,13 @@ public class FetchDefinitions extends FetchCommand<List<Definition>>{
     }
 
     @Override
-    protected List<Definition> doParseResult(String json) throws JSONException {
-        List<Definition> result = new ArrayList<>();
+    protected List<Definition> parseResult(String json) throws JSONException, EmptyResponseException {
         JSONArray root = new JSONArray(json);
+        if(root.length() <= 0){
+            throw new EmptyResponseException();
+        }
+
+        List<Definition> result = new ArrayList<>();
         for (int i = 0; i < root.length(); i++) {
             JSONObject syllable = (JSONObject) root.get(i);
             String partOfSpeech = syllable.getString("partOfSpeech");
