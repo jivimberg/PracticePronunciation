@@ -1,5 +1,8 @@
 package com.eightblocksaway.android.practicepronunciation;
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -9,11 +12,14 @@ import com.eightblocksaway.android.practicepronunciation.data.PronunciationContr
 import com.eightblocksaway.android.practicepronunciation.view.MainActivity;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
@@ -35,14 +41,22 @@ import static org.junit.internal.matchers.StringContains.containsString;
 @LargeTest
 public class EspressoTest {
 
+    private final String IPA_PHRASE_PRONUNCIATION = "həˈloʊ";
+    private final String AHD_PHRASE_PRONUNCIATION = "(hĕ-lōˈ, hə-)";
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
     private static final String PHRASE = "hello";
 
+    @SuppressLint("CommitPrefEdits")
     @Before
     public void cleanup(){
         //clean all phrases
-        mActivityRule.getActivity().getContentResolver().delete(PronunciationContract.PhraseEntry.CONTENT_URI, null, null);
+        MainActivity ctx = mActivityRule.getActivity();
+        ctx.getContentResolver().delete(PronunciationContract.PhraseEntry.CONTENT_URI, null, null);
+
+        //cleanup user preferences
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        sharedPref.edit().putString(ctx.getString(R.string.pronunciation_dictionary_key), ctx.getString(R.string.ahd_key)).commit();
     }
 
     @Test
@@ -70,7 +84,7 @@ public class EspressoTest {
          * Need to add this delay for the AsyncTask to commence :(
          */
         Thread.sleep(1200);
-        checkDetailView(false);
+        checkDetailView(false, R.string.ahd);
     }
 
     @Test
@@ -81,7 +95,7 @@ public class EspressoTest {
          * Need to add this delay for the AsyncTask to commence :(
          */
         Thread.sleep(1200);
-        checkDetailView(false);
+        checkDetailView(false, R.string.ahd);
 
         onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
 
@@ -89,7 +103,7 @@ public class EspressoTest {
          * Need to add this delay for the AsyncTask to commence :(
          */
         Thread.sleep(1200);
-        checkDetailView(false);
+        checkDetailView(false, R.string.ahd);
     }
 
     /**
@@ -153,6 +167,42 @@ public class EspressoTest {
         onView(withId(R.id.phrase_list)).check(matches(hasDescendant(withText(containsString(PHRASE)))));
     }
 
+    @Ignore
+    public void changePronunciationDict() throws InterruptedException {
+        testAdd();
+
+        changeDictionary(R.string.ipa);
+
+        onView(withId(R.id.phrase_list)).check(matches(hasDescendant(withText(containsString(IPA_PHRASE_PRONUNCIATION)))));
+    }
+
+    @Test
+    public void changePronunciationDictSearch() throws InterruptedException {
+        changeDictionary(R.string.ipa);
+
+        onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
+
+        /**
+         * Need to add this delay for the AsyncTask to commence :(
+         */
+        Thread.sleep(1200);
+
+        checkDetailView(false, R.string.ipa);
+    }
+
+    private void changeDictionary(int dictionary) {
+        // Open the overflow menu OR open the options menu,
+        // depending on if the device has a hardware or software overflow menu button.
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        onView(withText(R.string.action_settings)).perform(click());
+        onView(withText(R.string.pronunciation_preference_title)).perform(click());
+        onView(withText(dictionary)).perform(click());
+
+        // go back
+        pressBack();
+    }
+
 
     /**
      * Want to test that no ANR is thrown
@@ -169,7 +219,7 @@ public class EspressoTest {
         onView(withId(R.id.edit_text)).perform(typeText(PHRASE));
 
         onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
-        checkDetailView(true);
+        checkDetailView(true, R.string.ahd);
     }
 
 
@@ -180,7 +230,7 @@ public class EspressoTest {
         //noinspection unchecked
         onView(withText(containsString(PHRASE))).perform(click());
 
-        checkDetailView(true);
+        checkDetailView(true, R.string.ahd);
     }
 
     @Test
@@ -220,9 +270,17 @@ public class EspressoTest {
         onView(withId(R.id.phrase_list_fragment)).check(matches(isDisplayed()));
     }
 
-    private void checkDetailView(boolean phraseAdded) {
+    private void checkDetailView(boolean phraseAdded, int dictionary) {
         // check buttons become enabled
         onView(withId(R.id.listen_button)).check(matches(isEnabled()));
+
+        if(dictionary == R.string.ipa){
+            onView(withId(R.id.pronunciation_alphabet_label)).check(matches(withText(IPA_PHRASE_PRONUNCIATION)));
+        } else {
+            onView(withId(R.id.pronunciation_alphabet_label)).check(matches(withText(AHD_PHRASE_PRONUNCIATION)));
+        }
+
+        onView(withId(R.id.edit_text)).check(matches(withText(PHRASE)));
 
         /**
          * No voice recognition support on the emulator
