@@ -90,6 +90,13 @@ public class PhraseListFragment extends Fragment implements LoaderManager.Loader
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //TODO this is only needed if the alphabet dictionary has changed
+        phrasesCursorAdapter.notifyDataSetChanged();
+    }
+
     @Override public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.reset(this);

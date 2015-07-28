@@ -167,7 +167,7 @@ public class EspressoTest {
         onView(withId(R.id.phrase_list)).check(matches(hasDescendant(withText(containsString(PHRASE)))));
     }
 
-    @Ignore
+    @Test
     public void changePronunciationDict() throws InterruptedException {
         testAdd();
 
