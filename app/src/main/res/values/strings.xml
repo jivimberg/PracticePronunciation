@@ -31,5 +31,8 @@
     <string name="ahd_key">ahd-legacy</string>
     <string name="ipa_key">ipa</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="about_dialog_key">about</string>
+    <string name="about_dialog_title">About</string>
+    <string name="about_dialog_summary">Information about this app</string>
 
 </resources>

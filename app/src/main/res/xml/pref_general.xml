@@ -10,4 +10,12 @@
         android:entryValues="@array/unit_values"
         android:defaultValue="@string/ahd_key"/>
 
+    <com.eightblocksaway.android.practicepronunciation.view.AboutDialog
+        android:key="@string/about_dialog_key"
+        android:title="@string/about_dialog_title"
+        android:summary="@string/about_dialog_summary"
+        android:dialogMessage=" “This app is powered By Macmillan English Dictionary and Thesaurus” "
+        android:positiveButtonText="Got it"
+        android:negativeButtonText="@null"/>
+
 </PreferenceScreen>
