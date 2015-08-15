@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 
 import com.eightblocksaway.android.practicepronunciation.R;
 import com.eightblocksaway.android.practicepronunciation.model.Phrase;
@@ -18,8 +21,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
-public class MainActivity extends ActionBarActivity
+
+public class MainActivity extends AppCompatActivity
         implements PhraseSelectCallback, PhraseFetchAsyncTask.Callback, PhraseInputFragment.Callback {
 
     public static final String LOG_TAG = "MainActivity";
@@ -28,10 +34,17 @@ public class MainActivity extends ActionBarActivity
     private DetailFragment detailFragment;
     private boolean isPhone;
 
+    @InjectView(R.id.toolbar) Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.inject(this);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         if(savedInstanceState != null){
             phraseInputFragment = (PhraseInputFragment) getSupportFragmentManager().getFragment(
