@@ -8,7 +8,7 @@
 
     <!-- main activity toolbar style -->
     <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:background">@color/primary</item>
         <item name="popupTheme">@style/Theme.AppCompat.Light</item>
     </style>
 </resources>
