@@ -7,15 +7,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FetchPronunciation extends FetchCommand<String>{
+public class FetchAHDPronunciation extends FetchCommand<String>{
 
-    private static final String LOG_TAG = "FetchPronunciation";
+    private static final String LOG_TAG = "FetchAHDPronunciation";
 
-    private FetchPronunciation(Uri uri, String phrase) {
+    private FetchAHDPronunciation(Uri uri, String phrase) {
         super(uri, phrase);
     }
 
-    public static FetchPronunciation create(String phrase){
+    public static FetchAHDPronunciation create(String phrase){
         String normalizedPhrase = phrase.toLowerCase();
         Uri builtUri = Uri.parse(BASE_URI).buildUpon()
                 .appendPath(normalizedPhrase)
@@ -25,7 +25,7 @@ public class FetchPronunciation extends FetchCommand<String>{
                 .appendQueryParameter("limit", "1")
                 .appendQueryParameter("api_key", API_KEY)
                 .build();
-        return new FetchPronunciation(builtUri, phrase);
+        return new FetchAHDPronunciation(builtUri, phrase);
     }
 
     @Override

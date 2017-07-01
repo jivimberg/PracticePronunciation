@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FetchDefinitions extends FetchCommand<List<Definition>>{
 
-    private static final String LOG_TAG = "FetchPronunciation";
+    private static final String LOG_TAG = "FetchAHDPronunciation";
 
     private FetchDefinitions(Uri uri, String phrase) {
         super(uri, phrase);

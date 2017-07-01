@@ -16,7 +16,7 @@ import java.util.List;
 
 public class FetchHyphenation extends FetchCommand<List<Syllable>>{
 
-    private static final String LOG_TAG = "FetchPronunciation";
+    private static final String LOG_TAG = "FetchAHDPronunciation";
 
     private FetchHyphenation(Uri uri, String phrase) {
         super(uri, phrase);

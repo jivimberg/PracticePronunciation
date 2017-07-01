@@ -3,6 +3,8 @@ package com.eightblocksaway.android.practicepronunciation.network;
 import android.net.Uri;
 import android.util.Log;
 
+import com.eightblocksaway.android.practicepronunciation.BuildConfig;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,23 +20,23 @@ import java.util.Map;
 
 public abstract class FetchCommand<T> {
     private static final String LOG_TAG = "FetchCommand";
-    protected static final String BASE_URI = "http://api.wordnik.com:80/v4/word.json/";
-    protected static final String API_KEY = "f4e175385742da274a23a0f99b20c521488ff167472c614f5";
+    static final String BASE_URI = "http://api.wordnik.com:80/v4/word.json/";
+    static final String API_KEY = BuildConfig.WORDNIK_API_KEY;
     private final Uri uri;
     private final String phrase;
     private Map<String, String> headers;
 
-    public FetchCommand(@NotNull Uri uri, @NotNull String phrase){
+    FetchCommand(@NotNull Uri uri, @NotNull String phrase){
         this(uri, phrase, new HashMap<String, String>());
     }
 
-    public FetchCommand(@NotNull Uri uri, @NotNull String phrase, @NotNull Map<String, String> headers){
+    FetchCommand(@NotNull Uri uri, @NotNull String phrase, @NotNull Map<String, String> headers){
         this.uri = uri;
         this.phrase = phrase;
         this.headers = headers;
     }
 
-    public T fetchData() throws IOException, JSONException, EmptyResponseException {
+    T fetchData() throws IOException, JSONException, EmptyResponseException {
         BufferedReader reader = null;
         HttpURLConnection urlConnection = null;
         Log.i(LOG_TAG, "Executing search for normalized phrase " + phrase);

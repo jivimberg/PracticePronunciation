@@ -1,16 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.eightblocksaway.android.practicepronunciation"
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 8
         versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "OXFORD_APP_ID", OXFORD_APP_ID)
+        buildConfigField("String", "OXFORD_APP_KEY", OXFORD_APP_KEY)
+        buildConfigField("String", "WORDNIK_API_KEY", WORDNIK_API_KEY)
     }
     buildTypes {
         release {
@@ -29,12 +32,13 @@ dependencies {
     compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
     compile 'com.nhaarman.listviewanimations:lib-manipulation:3.1.0@aar'
     compile 'com.nhaarman.listviewanimations:lib-core-slh:3.1.0@aar'
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:support-v4:22.0.0' // using 22.0 to avoid clash with espresso. Check: http://goo.gl/2L7ER0
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1' // using 22.0 to avoid clash with espresso. Check: http://goo.gl/2L7ER0
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.jakewharton:butterknife:6.1.0'
 
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
-    androidTestCompile 'com.android.support.test:runner:0.2'
-    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.android.support:support-annotations:25.3.1'
 }

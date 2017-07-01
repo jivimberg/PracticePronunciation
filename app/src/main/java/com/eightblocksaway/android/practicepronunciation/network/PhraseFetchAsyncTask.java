@@ -25,8 +25,8 @@ public class PhraseFetchAsyncTask extends AsyncTask<String, Void, AsyncTaskResul
     protected AsyncTaskResult<Phrase> doInBackground(String... params) {
         String phrase = params[0];
         try {
-            String ahdPronunciation = FetchPronunciation.create(phrase).fetchData();
-            String ipaPronunciation = FetchMacmillanPronunciation.create(phrase).fetchData();
+            String ahdPronunciation = FetchAHDPronunciation.create(phrase).fetchData();
+            String ipaPronunciation = FetchIPAPronunciation.create(phrase).fetchData();
             List<Definition> definitions = FetchDefinitions.create(phrase).fetchData();
             List<Syllable> hyphenation = FetchHyphenation.create(phrase).fetchData();
 

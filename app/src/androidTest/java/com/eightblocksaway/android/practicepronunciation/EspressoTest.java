@@ -35,13 +35,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.internal.matchers.StringContains.containsString;
+import static org.hamcrest.Matchers.containsString;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class EspressoTest {
 
-    private final String IPA_PHRASE_PRONUNCIATION = "həˈloʊ";
+    private final String IPA_PHRASE_PRONUNCIATION = "hɛˈləʊ";
     private final String AHD_PHRASE_PRONUNCIATION = "(hĕ-lōˈ, hə-)";
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
