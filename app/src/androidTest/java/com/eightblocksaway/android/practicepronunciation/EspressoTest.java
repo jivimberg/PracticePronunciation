@@ -3,6 +3,7 @@ package com.eightblocksaway.android.practicepronunciation;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.Espresso.pressBack;
@@ -41,7 +43,7 @@ import static org.hamcrest.Matchers.containsString;
 @LargeTest
 public class EspressoTest {
 
-    private final String IPA_PHRASE_PRONUNCIATION = "hɛˈləʊ";
+    private final String IPA_PHRASE_PRONUNCIATION = "həˈləʊ";
     private final String AHD_PHRASE_PRONUNCIATION = "(hĕ-lōˈ, hə-)";
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
@@ -264,6 +266,7 @@ public class EspressoTest {
         // Check that we are seeing the detail view
         onView(withId(R.id.detail_phrase_text)).check(matches(isDisplayed()));
 
+        closeSoftKeyboard();
         pressBack();
 
         onView(withId(R.id.detail_phrase_text)).check(doesNotExist());
