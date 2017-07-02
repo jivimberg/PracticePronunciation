@@ -18,6 +18,7 @@ package com.eightblocksaway.android.practicepronunciation.view;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -39,6 +40,8 @@ import com.eightblocksaway.android.practicepronunciation.R;
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {
 
+    public static final String PRIVACY_POLICY_WEBSITE = "http://jivimberg.github.io/PracticePronunciation/privacy_policy.html";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,17 @@ public class SettingsActivity extends PreferenceActivity
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pronunciation_dictionary_key)));
+
+        Preference button = findPreference(getString(R.string.privacy_policy_button));
+        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Uri uriUrl = Uri.parse(PRIVACY_POLICY_WEBSITE);
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+                return true;
+            }
+        });
     }
 
     /**

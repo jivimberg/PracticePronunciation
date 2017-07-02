@@ -34,5 +34,9 @@
     <string name="about_dialog_key">about</string>
     <string name="about_dialog_title">About</string>
     <string name="about_dialog_summary">Information about this app</string>
+    <string name="about_message">This app is powered by the Oxford Dictionaries API</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_summary">Opens the Privacy Policy on a browser</string>
+    <string name="privacy_policy_button">privacy_policy_button</string>
 
 </resources>
