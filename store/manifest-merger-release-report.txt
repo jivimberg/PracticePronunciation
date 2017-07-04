@@ -83,7 +83,7 @@ meta-data#android.support.PARENT_ACTIVITY
 ADDED from AndroidManifest.xml:33:13
 	android:name
 		ADDED from AndroidManifest.xml:34:17
-	android:value
+	android:typeName
 		ADDED from AndroidManifest.xml:35:17
 provider#com.eightblocksaway.android.practicepronunciation.data.PronunciationProvider
 ADDED from AndroidManifest.xml:38:9

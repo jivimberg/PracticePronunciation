@@ -37,11 +37,11 @@ public class FetchHyphenation extends FetchCommand<List<Syllable>>{
     @Override
     protected List<Syllable> parseResult(String json) throws JSONException, EmptyResponseException {
         JSONArray root = new JSONArray(json);
+        List<Syllable> result = new ArrayList<>();
         if(root.length() <= 0){
-            throw new EmptyResponseException();
+            return result;
         }
 
-        List<Syllable> result = new ArrayList<>();
         for (int i = 0; i < root.length(); i++) {
             JSONObject syllable = (JSONObject) root.get(i);
             String text = syllable.getString("text");

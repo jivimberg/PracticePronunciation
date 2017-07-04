@@ -127,7 +127,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
 
             //remove last separator
-            hyphenation.removeViewAt(hyphenation.getChildCount() - 1);
+            if(hyphenation.getChildCount() > 0) {
+                hyphenation.removeViewAt(hyphenation.getChildCount() - 1);
+            }
 
 
             //set definitions

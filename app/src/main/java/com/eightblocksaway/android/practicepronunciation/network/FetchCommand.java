@@ -36,7 +36,7 @@ public abstract class FetchCommand<T> {
         this.headers = headers;
     }
 
-    T fetchData() throws IOException, JSONException, EmptyResponseException {
+    public T fetchData() throws IOException, JSONException, EmptyResponseException {
         BufferedReader reader = null;
         HttpURLConnection urlConnection = null;
         Log.i(LOG_TAG, "Executing search for normalized phrase " + phrase);
