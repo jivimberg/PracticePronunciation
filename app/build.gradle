@@ -8,8 +8,8 @@ android {
         applicationId "com.eightblocksaway.android.practicepronunciation"
         minSdkVersion 10
         targetSdkVersion 25
-        versionCode 8
-        versionName "1.5"
+        versionCode 9
+        versionName "1.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "OXFORD_APP_ID", OXFORD_APP_ID)
         buildConfigField("String", "OXFORD_APP_KEY", OXFORD_APP_KEY)
